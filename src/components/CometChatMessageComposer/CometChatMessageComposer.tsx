@@ -2708,7 +2708,7 @@ try {
         >
           {getMediaFilePicker()}
             { state.showValidationError  || state.showMentionsCountWarning || headerView || clipboardPreview ||  getTextMessageEditPreview() || getReplyMessagePreview() ? getHeaderView() : null}
-          {getTextInput()}
+          {clipboardPreview ? null : getTextInput()}
         </div>
       </div></>
   );
