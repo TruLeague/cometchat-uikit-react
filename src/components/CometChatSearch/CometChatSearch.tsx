@@ -23,6 +23,7 @@ import { useCometChatSearchMessagesList } from "./useCometChatSearchMessagesList
 import { CometChatOption } from "../../modals";
 import { CometChatUIKitLoginListener } from "../../CometChatUIKit/CometChatUIKitLoginListener";
 import { ChatConfigurator } from "../../utils/ChatConfigurator";
+import { encryptName } from "../../utils/util";
 
 
 interface SearchState {
@@ -713,8 +714,9 @@ export function CometChatSearch(props: SearchProps) {
   };
   
   const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-      setSearchValue(e.target.value);
-      const newSearchText = e.target.value.trim();
+      let encryptedName = encryptName(e.target.value);
+      setSearchValue(encryptedName);
+      const newSearchText = encryptedName.trim();
       if (timeoutIdRef.current !== null) {
         window.clearTimeout(timeoutIdRef.current);
       }
