@@ -16,7 +16,7 @@ import { StickersConstants } from "../Extensions/Stickers/StickersConstants";
 import { CollaborativeWhiteboardConstants } from "../Extensions/CollaborativeWhiteboard/CollaborativeWhiteboardConstants";
 import { CollaborativeDocumentConstants } from "../Extensions/CollaborativeDocument/CollaborativeDocumentConstants";
 import { CometChatContextMenu } from "../BaseComponents/CometChatContextMenu/CometChatContextMenu";
-import { encryptName, getThemeMode, isURL, sanitizeCalendarObject } from "../../utils/util";
+import { getThemeMode, isURL, sanitizeCalendarObject } from "../../utils/util";
 import { ChatConfigurator } from "../../utils/ChatConfigurator";
 import { CometChatButton } from "../BaseComponents/CometChatButton/CometChatButton";
 import { CometChatCallEvents } from "../../events/CometChatCallEvents";
@@ -177,12 +177,6 @@ interface UseCometChatSearchConversationsListProps {
    * The logged-in user object.
    */
   loggedInUser?: CometChat.User | null;
-
-  /**
-   * Restrict conversation results to a specific receiver type.
-   * Use `"group"` for group conversations or `"user"` for 1:1 conversations.
-   */
-  conversationType?: "group" | "user";
 }
 
 
@@ -765,8 +759,7 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
     activeFilters = [],
     useScrollPagination = false,
     hideError = false,
-    loggedInUser,
-    conversationType = "user",
+    loggedInUser
   } = props;
 
   // Initialize state
@@ -783,7 +776,6 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
   const searchRequestRef = useRef<CometChat.ConversationsRequest | null>(null);
   const lastSearchKeyword = useRef<string>(searchKeyword);
   const lastActiveFilters = useRef<CometChatSearchFilter[]>(activeFilters);
-  const lastConversationType = useRef<"group" | "user" | undefined>(conversationType);
   const isMoreResultsLoading = useRef<boolean>(false);
   const fetchIdRef = useRef<string>("");
 
@@ -1186,18 +1178,16 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
   useEffect(() => {
     const hasKeywordChanged = searchKeyword !== lastSearchKeyword.current;
     const haveFiltersChanged = !arraysEqual(activeFilters, lastActiveFilters.current);
-    const hasConversationTypeChanged = conversationType !== lastConversationType.current;
 
-    if (hasKeywordChanged || haveFiltersChanged || hasConversationTypeChanged) {
+    if (hasKeywordChanged || haveFiltersChanged) {
       lastSearchKeyword.current = searchKeyword;
       lastActiveFilters.current = [...activeFilters];
-      lastConversationType.current = conversationType;
 
       // Reset the search state and start a new search
       dispatch({ type: "setConversationList", conversationList: [] });
       searchConversations();
     }
-  }, [searchKeyword, activeFilters, conversationType, searchConversations, arraysEqual]);
+  }, [searchKeyword, activeFilters]);
 
   // Helper function to compare arrays
   const arraysEqual = useCallback((a: any[], b: any[]) => {
@@ -1213,16 +1203,6 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
     return a.every((item, index) => item === b[index]);
   }, []);
 
-  const filterConversationsByType = useCallback((conversations: CometChat.Conversation[]) => {
-    if (!conversationType) {
-      return conversations;
-    }
-
-    return conversations.filter(
-      (conversation) => conversation.getConversationType() === conversationType
-    );
-  }, [conversationType]);
-
   /**
    * Build the conversations request with appropriate filters
    */
@@ -1232,8 +1212,7 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
     : new CometChat.ConversationsRequestBuilder();
 
     if (searchKeyword && searchKeyword.trim() !== "") {
-      const trimmedKeyword = searchKeyword.trim();
-      builder = builder.setSearchKeyword(encryptName(trimmedKeyword));
+      builder = builder.setSearchKeyword(searchKeyword);
     }
 
     const limit = useScrollPagination ? 30 : 3;
@@ -1249,12 +1228,8 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
       builder = builder.setConversationType(CometChatUIKitConstants.MessageReceiverType.group);
     }
 
-    if (conversationType) {
-      builder = builder.setConversationType(conversationType);
-    }
-
     return  builder.build();
-  }, [conversationsRequestBuilder, searchKeyword, activeFilters,useScrollPagination, conversationType]);
+  }, [conversationsRequestBuilder, searchKeyword, activeFilters,useScrollPagination]);
 
 
   /**
@@ -1277,10 +1252,9 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
       fetchIdRef.current = "initialFetch_" + Date.now();
 
       const conversations = await searchRequestRef.current.fetchNext();
-      const filteredConversations = filterConversationsByType(conversations);
 
-      if (filteredConversations.length > 0) {
-        dispatch({ type: "setConversationList", conversationList: filteredConversations });
+      if (conversations.length > 0) {
+        dispatch({ type: "setConversationList", conversationList: conversations });
         dispatch({ type: "setFetchState", fetchState: States.loaded });
         let limit = activeFilters.length > 0 ? 30 : 3;
 
@@ -1293,7 +1267,7 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
       dispatch({ type: "setFetchState", fetchState: States.error });
       errorHandler(error, "searchConversations");
     }
-  }, [searchKeyword, activeFilters, errorHandler, buildConversationsRequest, filterConversationsByType]);
+  }, [searchKeyword, activeFilters, errorHandler, buildConversationsRequest]);
 
 
   /**
@@ -1310,11 +1284,10 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
 
     try {
       const conversations = await searchRequestRef.current.fetchNext();
-      const filteredConversations = filterConversationsByType(conversations);
 
       // Check if this is still the latest fetch request
-      if (fetchIdRef.current === currentFetchId && filteredConversations.length > 0) {
-        dispatch({ type: "appendConversations", conversations: filteredConversations });
+      if (fetchIdRef.current === currentFetchId && conversations.length > 0) {
+        dispatch({ type: "appendConversations", conversations });
 
         // Check if there might be more results
         let limit = activeFilters.length > 0 ? 30 : 3;

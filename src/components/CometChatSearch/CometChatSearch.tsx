@@ -23,6 +23,7 @@ import { useCometChatSearchMessagesList } from "./useCometChatSearchMessagesList
 import { CometChatOption } from "../../modals";
 import { CometChatUIKitLoginListener } from "../../CometChatUIKit/CometChatUIKitLoginListener";
 import { ChatConfigurator } from "../../utils/ChatConfigurator";
+import { encryptName } from "../../utils/util";
 
 
 interface SearchState {
@@ -401,14 +402,6 @@ interface SearchProps {
   conversationOptions?: ((conversation: CometChat.Conversation) => CometChatOption[]) | null;
 
   /**
-   * Restrict conversation search results to a single type.
-   * Use `"group"` to show only group conversations or `"user"` for 1:1 conversations.
-   *
-   * @defaultValue undefined - show both users and groups
-   */
-  conversationType?: "group" | "user";
-
-  /**
    * Custom error handler for search operations
    * Override the default error handling behavior
    * 
@@ -453,7 +446,6 @@ export function CometChatSearch(props: SearchProps) {
     uid,
     guid,
     conversationOptions,
-    conversationType,
     onError
   } = props;
 
@@ -609,8 +601,7 @@ export function CometChatSearch(props: SearchProps) {
     options: conversationOptions,
     hideReceipts,
     loggedInUser,
-    textFormatters,
-    conversationType
+    textFormatters
   });
 
   const { renderMessagesList } = useCometChatSearchMessagesList({
@@ -869,7 +860,7 @@ export function CometChatSearch(props: SearchProps) {
             <input
               ref={searchInputRef}
               type="text"
-              value={searchValue}
+              value={encryptName(searchValue)}
               onChange={(e) => handleSearch(e)}
               placeholder={getLocalizedString("search_placeholder")}
               aria-label="Search"

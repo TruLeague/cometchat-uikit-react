@@ -16,7 +16,7 @@ import { CometChatButton } from "../BaseComponents/CometChatButton/CometChatButt
 import { CometChatMentionsFormatter, CometChatTextHighlightFormatter } from "../../formatters";
 import { CometChatUIKitLoginListener } from "../../CometChatUIKit/CometChatUIKitLoginListener";
 import {  hasLink, hasValidMessageSearchCriteria, isMonthDifferent } from "../../utils/SearchUtils";
-import { encryptName, isMessageSentByMe, isURL, sanitizeCalendarObject } from "../../utils/util";
+import { isMessageSentByMe, isURL, sanitizeCalendarObject } from "../../utils/util";
 import { CometChatUIKit } from "../../CometChatUIKit/CometChatUIKit";
 import { MessageUtils } from "../../utils/MessageUtils";
 import { MessagesDataSource } from "../../utils/MessagesDataSource";
@@ -869,8 +869,7 @@ const getMessageTitle = useCallback((message: CometChat.BaseMessage): string => 
     }
   
     if (searchKeyword && searchKeyword.trim() !== "") {
-      const trimmedKeyword = searchKeyword.trim();
-      builder = builder.setSearchKeyword(encryptName(trimmedKeyword));
+      builder = builder.setSearchKeyword(searchKeyword);
     }
   
     if (uid) {
