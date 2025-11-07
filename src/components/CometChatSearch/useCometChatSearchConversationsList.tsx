@@ -16,7 +16,7 @@ import { StickersConstants } from "../Extensions/Stickers/StickersConstants";
 import { CollaborativeWhiteboardConstants } from "../Extensions/CollaborativeWhiteboard/CollaborativeWhiteboardConstants";
 import { CollaborativeDocumentConstants } from "../Extensions/CollaborativeDocument/CollaborativeDocumentConstants";
 import { CometChatContextMenu } from "../BaseComponents/CometChatContextMenu/CometChatContextMenu";
-import { encryptName, getThemeMode, isURL, sanitizeCalendarObject } from "../../utils/util";
+import { getThemeMode, isURL, sanitizeCalendarObject } from "../../utils/util";
 import { ChatConfigurator } from "../../utils/ChatConfigurator";
 import { CometChatButton } from "../BaseComponents/CometChatButton/CometChatButton";
 import { CometChatCallEvents } from "../../events/CometChatCallEvents";
@@ -1212,9 +1212,7 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
     : new CometChat.ConversationsRequestBuilder();
 
     if (searchKeyword && searchKeyword.trim() !== "") {
-      const trimmedKeyword = searchKeyword.trim();
-      builder = builder.setSearchKeyword(encryptName(trimmedKeyword));
-      // builder = builder.setSearchKeyword(searchKeyword);
+      builder = builder.setSearchKeyword(searchKeyword);
     }
 
     const limit = useScrollPagination ? 30 : 3;
