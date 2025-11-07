@@ -714,9 +714,8 @@ export function CometChatSearch(props: SearchProps) {
   };
   
   const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-      let encryptedName = encryptName(e.target.value);
-      setSearchValue(encryptedName);
-      const newSearchText = encryptedName.trim();
+      setSearchValue(e.target.value);
+      const newSearchText = e.target.value.trim();
       if (timeoutIdRef.current !== null) {
         window.clearTimeout(timeoutIdRef.current);
       }
@@ -861,7 +860,7 @@ export function CometChatSearch(props: SearchProps) {
             <input
               ref={searchInputRef}
               type="text"
-              value={searchValue}
+              value={encryptName(searchValue)}
               onChange={(e) => handleSearch(e)}
               placeholder={getLocalizedString("search_placeholder")}
               aria-label="Search"
