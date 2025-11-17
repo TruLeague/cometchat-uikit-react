@@ -1935,7 +1935,14 @@ try {
     handleTyping();
     dispatch({ type: "setText", text: newText });
     mySetAddToMsgInputText("")
-    if (onTextChange !== undefined) onTextChange(newText);
+    let displayText = newText;
+    if (text) {
+      const contentEditable = getCurrentInput();
+      if (contentEditable) {
+        displayText = contentEditable.innerText;
+      }
+    }
+    if (onTextChange !== undefined) onTextChange(displayText);
   }
 } catch (error) {
   errorHandler(error,"onTextInputChange")
@@ -2251,11 +2258,11 @@ try {
     return uniqueIdRef.current;
   }, [user, group, parentMessageIdPropRef]);
 
-  function getCurrentInput() {
+  function getCurrentInput(): HTMLElement | null {
     if (!uniqueIdRef.current) {
       return null;
     }
-    return getCurrentDocument()?.querySelector(`.${uniqueIdRef.current}`)
+    return getCurrentDocument()?.querySelector<HTMLElement>(`.${uniqueIdRef.current}`)
   }
 
 
