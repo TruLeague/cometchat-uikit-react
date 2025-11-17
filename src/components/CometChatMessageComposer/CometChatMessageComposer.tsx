@@ -1781,7 +1781,7 @@ try {
     const hasPendingMedia = Boolean(pendingAttachment || clipboardPreview);
     const isEditingSameText =
       state.textMessageToEdit !== null &&
-      state.textMessageToEdit.getText() === state.text;
+      state.textMessageToEdit.getText() === text;
 
     if (hasPendingMedia) {
       return false;
