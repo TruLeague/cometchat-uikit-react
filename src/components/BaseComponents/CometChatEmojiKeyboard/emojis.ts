@@ -1708,28 +1708,28 @@ export const Emojis = [
         //   ],
         //   char: "👨‍❤️‍👨"
         // },
-        couplekiss_man_woman: {
-          keywords: [
-            "pair",
-            "valentines",
-            "love",
-            "like",
-            "dating",
-            "marriage"
-          ],
-          char: "💏"
-        },
-        couplekiss_woman_woman: {
-          keywords: [
-            "pair",
-            "valentines",
-            "love",
-            "like",
-            "dating",
-            "marriage"
-          ],
-          char: "👩‍❤️‍💋‍👩"
-        },
+        // couplekiss_man_woman: {
+        //   keywords: [
+        //     "pair",
+        //     "valentines",
+        //     "love",
+        //     "like",
+        //     "dating",
+        //     "marriage"
+        //   ],
+        //   char: "💏"
+        // },
+        // couplekiss_woman_woman: {
+        //   keywords: [
+        //     "pair",
+        //     "valentines",
+        //     "love",
+        //     "like",
+        //     "dating",
+        //     "marriage"
+        //   ],
+        //   char: "👩‍❤️‍💋‍👩"
+        // },
         // couplekiss_man_man: {
         //   keywords: [
         //     "pair",
