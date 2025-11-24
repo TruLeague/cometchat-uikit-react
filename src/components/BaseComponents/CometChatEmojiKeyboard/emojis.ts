@@ -159,33 +159,33 @@ export const Emojis = [
           keywords: ["face", "relaxed", "phew", "massage", "happiness"],
           char: "😌"
         },
-        // heart_eyes: {
-        //   keywords: [
-        //     "face",
-        //     "love",
-        //     "like",
-        //     "affection",
-        //     "valentines",
-        //     "infatuation",
-        //     "crush",
-        //     "heart"
-        //   ],
-        //   char: "😍"
-        // },
-        // smiling_face_with_three_hearts: {
-        //   keywords: [
-        //     "face",
-        //     "love",
-        //     "like",
-        //     "affection",
-        //     "valentines",
-        //     "infatuation",
-        //     "crush",
-        //     "hearts",
-        //     "adore"
-        //   ],
-        //   char: "🥰"
-        // },
+        heart_eyes: {
+          keywords: [
+            "face",
+            "love",
+            "like",
+            "affection",
+            "valentines",
+            "infatuation",
+            "crush",
+            "heart"
+          ],
+          char: "😍"
+        },
+        smiling_face_with_three_hearts: {
+          keywords: [
+            "face",
+            "love",
+            "like",
+            "affection",
+            "valentines",
+            "infatuation",
+            "crush",
+            "hearts",
+            "adore"
+          ],
+          char: "🥰"
+        },
         // kissing_heart: {
         //   keywords: [
         //     "face",
@@ -198,34 +198,34 @@ export const Emojis = [
         //   ],
         //   char: "😘"
         // },
-        // kissing: {
-        //   keywords: [
-        //     "love",
-        //     "like",
-        //     "face",
-        //     "3",
-        //     "valentines",
-        //     "infatuation",
-        //     "kiss"
-        //   ],
-        //   char: "😗"
-        // },
-        // kissing_smiling_eyes: {
-        //   keywords: ["face", "affection", "valentines", "infatuation", "kiss"],
-        //   char: "😙"
-        // },
-        // kissing_closed_eyes: {
-        //   keywords: [
-        //     "face",
-        //     "love",
-        //     "like",
-        //     "affection",
-        //     "valentines",
-        //     "infatuation",
-        //     "kiss"
-        //   ],
-        //   char: "😚"
-        // },
+        kissing: {
+          keywords: [
+            "love",
+            "like",
+            "face",
+            "3",
+            "valentines",
+            "infatuation",
+            "kiss"
+          ],
+          char: "😗"
+        },
+        kissing_smiling_eyes: {
+          keywords: ["face", "affection", "valentines", "infatuation", "kiss"],
+          char: "😙"
+        },
+        kissing_closed_eyes: {
+          keywords: [
+            "face",
+            "love",
+            "like",
+            "affection",
+            "valentines",
+            "infatuation",
+            "kiss"
+          ],
+          char: "😚"
+        },
         // stuck_out_tongue_winking_eye: {
         //   keywords: [
         //     "face",
@@ -239,10 +239,10 @@ export const Emojis = [
         //   ],
         //   char: "😜"
         // },
-        zany: {
-          keywords: ["face", "goofy", "crazy"],
-          char: "🤪"
-        },
+        // zany: {
+        //   keywords: ["face", "goofy", "crazy"],
+        //   char: "🤪"
+        // },
         raised_eyebrow: {
           keywords: [
             "face",
@@ -269,22 +269,22 @@ export const Emojis = [
         //   ],
         //   char: "😝"
         // },
-        // stuck_out_tongue: {
-        //   keywords: [
-        //     "face",
-        //     "prank",
-        //     "childish",
-        //     "playful",
-        //     "mischievous",
-        //     "smile",
-        //     "tongue"
-        //   ],
-        //   char: "😛"
-        // },
-        money_mouth_face: {
-          keywords: ["face", "rich", "dollar", "money"],
-          char: "🤑"
+        stuck_out_tongue: {
+          keywords: [
+            "face",
+            "prank",
+            "childish",
+            "playful",
+            "mischievous",
+            "smile",
+            "tongue"
+          ],
+          char: "😛"
         },
+        // money_mouth_face: {
+        //   keywords: ["face", "rich", "dollar", "money"],
+        //   char: "🤑"
+        // },
         nerd_face: {
           keywords: ["face", "nerdy", "geek", "dork"],
           char: "🤓"
@@ -297,10 +297,10 @@ export const Emojis = [
           keywords: ["face", "smile", "starry", "eyes", "grinning"],
           char: "🤩"
         },
-        clown_face: {
-          keywords: ["face"],
-          char: "🤡"
-        },
+        // clown_face: {
+        //   keywords: ["face"],
+        //   char: "🤡"
+        // },
         cowboy_hat_face: {
           keywords: ["face", "cowgirl", "hat"],
           char: "🤠"
@@ -370,10 +370,10 @@ export const Emojis = [
         //   ],
         //   char: "🤬"
         // },
-        exploding_head: {
-          keywords: ["face", "shocked", "mind", "blown"],
-          char: "🤯"
-        },
+        // exploding_head: {
+        //   keywords: ["face", "shocked", "mind", "blown"],
+        //   char: "🤯"
+        // },
         flushed: {
           keywords: ["face", "blush", "shy", "flattered"],
           char: "😳"
@@ -386,10 +386,10 @@ export const Emojis = [
           keywords: ["face", "concern", "nervous", ":("],
           char: "😟"
         },
-        angry: {
-          keywords: ["mad", "face", "annoyed", "frustrated"],
-          char: "😠"
-        },
+        // angry: {
+        //   keywords: ["mad", "face", "annoyed", "frustrated"],
+        //   char: "😠"
+        // },
         // rage: {
         //   keywords: ["angry", "mad", "hate", "despise"],
         //   char: "😡"
@@ -422,26 +422,26 @@ export const Emojis = [
           keywords: ["sick", "whine", "upset", "frustrated"],
           char: "😫"
         },
-        weary: {
-          keywords: ["face", "tired", "sleepy", "sad", "frustrated", "upset"],
-          char: "😩"
-        },
+        // weary: {
+        //   keywords: ["face", "tired", "sleepy", "sad", "frustrated", "upset"],
+        //   char: "😩"
+        // },
         pleading: {
           keywords: ["face", "begging", "mercy"],
           char: "🥺"
         },
-        triumph: {
-          keywords: ["face", "gas", "phew", "proud", "pride"],
-          char: "😤"
-        },
+        // triumph: {
+        //   keywords: ["face", "gas", "phew", "proud", "pride"],
+        //   char: "😤"
+        // },
         open_mouth: {
           keywords: ["face", "surprise", "impressed", "wow", "whoa", ":O"],
           char: "😮"
         },
-        scream: {
-          keywords: ["face", "munch", "scared", "omg"],
-          char: "😱"
-        },
+        // scream: {
+        //   keywords: ["face", "munch", "scared", "omg"],
+        //   char: "😱"
+        // },
         fearful: {
           keywords: ["face", "scared", "terrified", "nervous", "oops", "huh"],
           char: "😨"
@@ -482,25 +482,25 @@ export const Emojis = [
           keywords: ["face", "hot", "sad", "tired", "exercise"],
           char: "😓"
         },
-        hot: {
-          keywords: ["face", "feverish", "heat", "red", "sweating"],
-          char: "🥵"
-        },
-        cold: {
-          keywords: [
-            "face",
-            "blue",
-            "freezing",
-            "frozen",
-            "frostbite",
-            "icicles"
-          ],
-          char: "🥶"
-        },
-        sob: {
-          keywords: ["face", "cry", "tears", "sad", "upset", "depressed"],
-          char: "😭"
-        },
+        // hot: {
+        //   keywords: ["face", "feverish", "heat", "red", "sweating"],
+        //   char: "🥵"
+        // },
+        // cold: {
+        //   keywords: [
+        //     "face",
+        //     "blue",
+        //     "freezing",
+        //     "frozen",
+        //     "frostbite",
+        //     "icicles"
+        //   ],
+        //   char: "🥶"
+        // },
+        // sob: {
+        //   keywords: ["face", "cry", "tears", "sad", "upset", "depressed"],
+        //   char: "😭"
+        // },
         // dizzy_face: {
         //   keywords: ["spent", "unconscious", "xox", "dizzy"],
         //   char: "😵"
@@ -513,26 +513,26 @@ export const Emojis = [
           keywords: ["face", "sealed", "zipper", "secret"],
           char: "🤐"
         },
-        nauseated_face: {
-          keywords: [
-            "face",
-            "vomit",
-            "gross",
-            "green",
-            "sick",
-            "throw up",
-            "ill"
-          ],
-          char: "🤢"
-        },
+        // nauseated_face: {
+        //   keywords: [
+        //     "face",
+        //     "vomit",
+        //     "gross",
+        //     "green",
+        //     "sick",
+        //     "throw up",
+        //     "ill"
+        //   ],
+        //   char: "🤢"
+        // },
         sneezing_face: {
           keywords: ["face", "gesundheit", "sneeze", "sick", "allergy"],
           char: "🤧"
         },
-        vomiting: {
-          keywords: ["face", "sick"],
-          char: "🤮"
-        },
+        // vomiting: {
+        //   keywords: ["face", "sick"],
+        //   char: "🤮"
+        // },
         mask: {
           keywords: ["face", "sick", "ill", "disease"],
           char: "😷"
@@ -549,10 +549,10 @@ export const Emojis = [
         //   keywords: ["face", "dizzy", "intoxicated", "tipsy", "wavy"],
         //   char: "🥴"
         // },
-        sleeping: {
-          keywords: ["face", "tired", "sleepy", "night", "zzz"],
-          char: "😴"
-        },
+        // sleeping: {
+        //   keywords: ["face", "tired", "sleepy", "night", "zzz"],
+        //   char: "😴"
+        // },
         zzz: {
           keywords: ["sleepy", "tired", "dream"],
           char: "💤"
@@ -561,14 +561,14 @@ export const Emojis = [
         //   keywords: ["hankey", "shitface", "fail", "turd", "shit"],
         //   char: "💩"
         // },
-        smiling_imp: {
-          keywords: ["devil", "horns"],
-          char: "😈"
-        },
-        imp: {
-          keywords: ["devil", "angry", "horns"],
-          char: "👿"
-        },
+        // smiling_imp: {
+        //   keywords: ["devil", "horns"],
+        //   char: "😈"
+        // },
+        // imp: {
+        //   keywords: ["devil", "angry", "horns"],
+        //   char: "👿"
+        // },
         japanese_ogre: {
           keywords: [
             "monster",
@@ -601,10 +601,10 @@ export const Emojis = [
         //   keywords: ["dead", "skeleton", "creepy", "death"],
         //   char: "💀"
         // },
-        ghost: {
-          keywords: ["halloween", "spooky", "scary"],
-          char: "👻"
-        },
+        // ghost: {
+        //   keywords: ["halloween", "spooky", "scary"],
+        //   char: "👻"
+        // },
         alien: {
           keywords: ["UFO", "paul", "weird", "outer_space"],
           char: "👽"
@@ -625,18 +625,18 @@ export const Emojis = [
           keywords: ["animal", "cats", "haha", "happy", "tears"],
           char: "😹"
         },
-        // heart_eyes_cat: {
-        //   keywords: [
-        //     "animal",
-        //     "love",
-        //     "like",
-        //     "affection",
-        //     "cats",
-        //     "valentines",
-        //     "heart"
-        //   ],
-        //   char: "😻"
-        // },
+        heart_eyes_cat: {
+          keywords: [
+            "animal",
+            "love",
+            "like",
+            "affection",
+            "cats",
+            "valentines",
+            "heart"
+          ],
+          char: "😻"
+        },
         smirk_cat: {
           keywords: ["animal", "cats", "smirk"],
           char: "😼"
@@ -901,11 +901,11 @@ export const Emojis = [
           keywords: ["user", "person", "human", "sing", "say", "talk"],
           char: "🗣"
         },
-        // baby: {
-        //   keywords: ["child", "boy", "girl", "toddler"],
-        //   char: "👶",
-        //   fitzpatrick_scale: true
-        // },
+        baby: {
+          keywords: ["child", "boy", "girl", "toddler"],
+          char: "👶",
+          fitzpatrick_scale: true
+        },
         child: {
           keywords: ["gender-neutral", "young"],
           char: "🧒",
@@ -1361,10 +1361,10 @@ export const Emojis = [
           char: "🧛‍♂️",
           fitzpatrick_scale: true
         },
-        // woman_zombie: {
-        //   keywords: ["woman", "female", "undead", "walking dead"],
-        //   char: "🧟‍♀️"
-        // },
+        woman_zombie: {
+          keywords: ["woman", "female", "undead", "walking dead"],
+          char: "🧟‍♀️"
+        },
         man_zombie: {
           keywords: ["man", "male", "dracula", "undead", "walking dead"],
           char: "🧟‍♂️"
@@ -1402,16 +1402,16 @@ export const Emojis = [
           char: "👼",
           fitzpatrick_scale: true
         },
-        // pregnant_woman: {
-        //   keywords: ["baby"],
-        //   char: "🤰",
-        //   fitzpatrick_scale: true
-        // },
-        // breastfeeding: {
-        //   keywords: ["nursing", "baby"],
-        //   char: "🤱",
-        //   fitzpatrick_scale: true
-        // },
+        pregnant_woman: {
+          keywords: ["baby"],
+          char: "🤰",
+          fitzpatrick_scale: true
+        },
+        breastfeeding: {
+          keywords: ["nursing", "baby"],
+          char: "🤱",
+          fitzpatrick_scale: true
+        },
         princess: {
           keywords: [
             "girl",
@@ -1485,21 +1485,21 @@ export const Emojis = [
           keywords: ["male", "bunny", "men", "boys"],
           char: "👯‍♂️"
         },
-        couple: {
-          keywords: [
-            "pair",
-            "people",
-            "human",
-            "love",
-            "date",
-            "dating",
-            "like",
-            "affection",
-            "valentines",
-            "marriage"
-          ],
-          char: "👫"
-        },
+        // couple: {
+        //   keywords: [
+        //     "pair",
+        //     "people",
+        //     "human",
+        //     "love",
+        //     "date",
+        //     "dating",
+        //     "like",
+        //     "affection",
+        //     "valentines",
+        //     "marriage"
+        //   ],
+        //   char: "👫"
+        // },
         two_men_holding_hands: {
           keywords: [
             "pair",
@@ -1659,42 +1659,42 @@ export const Emojis = [
           char: "💆‍♂️",
           fitzpatrick_scale: true
         },
-        // woman_in_steamy_room: {
-        //   keywords: ["female", "woman", "spa", "steamroom", "sauna"],
-        //   char: "🧖‍♀️",
-        //   fitzpatrick_scale: true
-        // },
-        // man_in_steamy_room: {
-        //   keywords: ["male", "man", "spa", "steamroom", "sauna"],
-        //   char: "🧖‍♂️",
-        //   fitzpatrick_scale: true
-        // },
-        // couple_with_heart_woman_man: {
-        //   keywords: [
-        //     "pair",
-        //     "love",
-        //     "like",
-        //     "affection",
-        //     "human",
-        //     "dating",
-        //     "valentines",
-        //     "marriage"
-        //   ],
-        //   char: "💑"
-        // },
-        // couple_with_heart_woman_woman: {
-        //   keywords: [
-        //     "pair",
-        //     "love",
-        //     "like",
-        //     "affection",
-        //     "human",
-        //     "dating",
-        //     "valentines",
-        //     "marriage"
-        //   ],
-        //   char: "👩‍❤️‍👩"
-        // },
+        woman_in_steamy_room: {
+          keywords: ["female", "woman", "spa", "steamroom", "sauna"],
+          char: "🧖‍♀️",
+          fitzpatrick_scale: true
+        },
+        man_in_steamy_room: {
+          keywords: ["male", "man", "spa", "steamroom", "sauna"],
+          char: "🧖‍♂️",
+          fitzpatrick_scale: true
+        },
+        couple_with_heart_woman_man: {
+          keywords: [
+            "pair",
+            "love",
+            "like",
+            "affection",
+            "human",
+            "dating",
+            "valentines",
+            "marriage"
+          ],
+          char: "💑"
+        },
+        couple_with_heart_woman_woman: {
+          keywords: [
+            "pair",
+            "love",
+            "like",
+            "affection",
+            "human",
+            "dating",
+            "valentines",
+            "marriage"
+          ],
+          char: "👩‍❤️‍👩"
+        },
         // couple_with_heart_man_man: {
         //   keywords: [
         //     "pair",
@@ -1708,28 +1708,28 @@ export const Emojis = [
         //   ],
         //   char: "👨‍❤️‍👨"
         // },
-        // couplekiss_man_woman: {
-        //   keywords: [
-        //     "pair",
-        //     "valentines",
-        //     "love",
-        //     "like",
-        //     "dating",
-        //     "marriage"
-        //   ],
-        //   char: "💏"
-        // },
-        // couplekiss_woman_woman: {
-        //   keywords: [
-        //     "pair",
-        //     "valentines",
-        //     "love",
-        //     "like",
-        //     "dating",
-        //     "marriage"
-        //   ],
-        //   char: "👩‍❤️‍💋‍👩"
-        // },
+        couplekiss_man_woman: {
+          keywords: [
+            "pair",
+            "valentines",
+            "love",
+            "like",
+            "dating",
+            "marriage"
+          ],
+          char: "💏"
+        },
+        couplekiss_woman_woman: {
+          keywords: [
+            "pair",
+            "valentines",
+            "love",
+            "like",
+            "dating",
+            "marriage"
+          ],
+          char: "👩‍❤️‍💋‍👩"
+        },
         // couplekiss_man_man: {
         //   keywords: [
         //     "pair",
@@ -1910,10 +1910,10 @@ export const Emojis = [
           keywords: ["dress", "fashion", "women", "female", "japanese"],
           char: "👘"
         },
-        lipstick: {
-          keywords: ["female", "girl", "fashion", "woman"],
-          char: "💄"
-        },
+        // lipstick: {
+        //   keywords: ["female", "girl", "fashion", "woman"],
+        //   char: "💄"
+        // },
         // kiss: {
         //   keywords: ["face", "lips", "love", "like", "affection", "valentines"],
         //   char: "💋"
@@ -1926,10 +1926,10 @@ export const Emojis = [
           keywords: ["ballet", "slip-on", "slipper"],
           char: "🥿"
         },
-        high_heel: {
-          keywords: ["fashion", "shoes", "female", "pumps", "stiletto"],
-          char: "👠"
-        },
+        // high_heel: {
+        //   keywords: ["fashion", "shoes", "female", "pumps", "stiletto"],
+        //   char: "👠"
+        // },
         sandal: {
           keywords: ["shoes", "fashion", "flip flops"],
           char: "👡"
@@ -2570,10 +2570,10 @@ export const Emojis = [
           keywords: ["plant", "nature", "grass", "lawn", "spring"],
           char: "🌱"
         },
-        herb: {
-          keywords: ["vegetable", "plant", "medicine", "weed", "grass", "lawn"],
-          char: "🌿"
-        },
+        // herb: {
+        //   keywords: ["vegetable", "plant", "medicine", "weed", "grass", "lawn"],
+        //   char: "🌿"
+        // },
         shamrock: {
           keywords: ["vegetable", "plant", "nature", "irish", "clover"],
           char: "☘"
@@ -2612,10 +2612,10 @@ export const Emojis = [
           keywords: ["nature", "plant", "vegetable", "leaves"],
           char: "🍂"
         },
-        // maple_leaf: {
-        //   keywords: ["nature", "plant", "vegetable", "ca", "fall"],
-        //   char: "🍁"
-        // },
+        maple_leaf: {
+          keywords: ["nature", "plant", "vegetable", "ca", "fall"],
+          char: "🍁"
+        },
         ear_of_rice: {
           keywords: ["nature", "plant"],
           char: "🌾"
@@ -3055,10 +3055,10 @@ export const Emojis = [
           keywords: ["fruit", "nature", "food"],
           char: "🍈"
         },
-        cherries: {
-          keywords: ["food", "fruit"],
-          char: "🍒"
-        },
+        // cherries: {
+        //   keywords: ["food", "fruit"],
+        //   char: "🍒"
+        // },
         // peach: {
         //   keywords: ["fruit", "nature", "food"],
         //   char: "🍑"
@@ -3485,18 +3485,18 @@ export const Emojis = [
         //   keywords: ["drink", "wine", "bottle", "celebration"],
         //   char: "🍾"
         // },
-        // sake: {
-        //   keywords: [
-        //     "wine",
-        //     "drink",
-        //     "drunk",
-        //     "beverage",
-        //     "japanese",
-        //     "alcohol",
-        //     "booze"
-        //   ],
-        //   char: "🍶"
-        // },
+        sake: {
+          keywords: [
+            "wine",
+            "drink",
+            "drunk",
+            "beverage",
+            "japanese",
+            "alcohol",
+            "booze"
+          ],
+          char: "🍶"
+        },
         tea: {
           keywords: ["drink", "bowl", "breakfast", "green", "british"],
           char: "🍵"
@@ -3509,10 +3509,10 @@ export const Emojis = [
           keywords: ["beverage", "caffeine", "latte", "espresso"],
           char: "☕"
         },
-        // baby_bottle: {
-        //   keywords: ["food", "container", "milk"],
-        //   char: "🍼"
-        // },
+        baby_bottle: {
+          keywords: ["food", "container", "milk"],
+          char: "🍼"
+        },
         salt: {
           keywords: ["condiment", "shaker"],
           char: "🧂"
@@ -3644,10 +3644,10 @@ export const Emojis = [
           char: "🏂",
           fitzpatrick_scale: true
         },
-        // person_fencing: {
-        //   keywords: ["sports", "fencing", "sword"],
-        //   char: "🤺"
-        // },
+        person_fencing: {
+          keywords: ["sports", "fencing", "sword"],
+          char: "🤺"
+        },
         women_wrestling: {
           keywords: ["sports", "wrestlers"],
           char: "🤼‍♀️"
@@ -3692,10 +3692,10 @@ export const Emojis = [
           keywords: ["sleigh", "luge", "toboggan"],
           char: "🛷"
         },
-        // bow_and_arrow: {
-        //   keywords: ["sports"],
-        //   char: "🏹"
-        // },
+        bow_and_arrow: {
+          keywords: ["sports"],
+          char: "🏹"
+        },
         fishing_pole_and_fish: {
           keywords: ["food", "hobby", "summer"],
           char: "🎣"
@@ -3808,11 +3808,11 @@ export const Emojis = [
           char: "🏄",
           fitzpatrick_scale: true
         },
-        // bath: {
-        //   keywords: ["clean", "shower", "bathroom"],
-        //   char: "🛀",
-        //   fitzpatrick_scale: true
-        // },
+        bath: {
+          keywords: ["clean", "shower", "bathroom"],
+          char: "🛀",
+          fitzpatrick_scale: true
+        },
         basketball_woman: {
           keywords: ["sports", "human", "woman", "female"],
           char: "⛹️‍♀️",
@@ -3996,25 +3996,25 @@ export const Emojis = [
           keywords: ["game", "play", "bar", "target", "bullseye"],
           char: "🎯"
         },
-        game_die: {
-          keywords: ["dice", "random", "tabletop", "play", "luck"],
-          char: "🎲"
-        },
+        // game_die: {
+        //   keywords: ["dice", "random", "tabletop", "play", "luck"],
+        //   char: "🎲"
+        // },
         chess_pawn: {
           keywords: ["expendable"],
           char: "♟"
         },
-        slot_machine: {
-          keywords: [
-            "bet",
-            "gamble",
-            "vegas",
-            "fruit machine",
-            "luck",
-            "casino"
-          ],
-          char: "🎰"
-        },
+        // slot_machine: {
+        //   keywords: [
+        //     "bet",
+        //     "gamble",
+        //     "vegas",
+        //     "fruit machine",
+        //     "luck",
+        //     "casino"
+        //   ],
+        //   char: "🎰"
+        // },
         jigsaw: {
           keywords: ["interlocking", "puzzle", "piece"],
           char: "🧩"
@@ -4792,10 +4792,10 @@ export const Emojis = [
           keywords: ["barrell"],
           char: "🛢"
         },
-        money_with_wings: {
-          keywords: ["dollar", "bills", "payment", "sale"],
-          char: "💸"
-        },
+        // money_with_wings: {
+        //   keywords: ["dollar", "bills", "payment", "sale"],
+        //   char: "💸"
+        // },
         dollar: {
           keywords: ["money", "sales", "bill", "currency"],
           char: "💵"
@@ -4821,10 +4821,10 @@ export const Emojis = [
           ],
           char: "💷"
         },
-        moneybag: {
-          keywords: ["dollar", "payment", "coins", "sale"],
-          char: "💰"
-        },
+        // moneybag: {
+        //   keywords: ["dollar", "payment", "coins", "sale"],
+        //   char: "💰"
+        // },
         credit_card: {
           keywords: ["money", "sales", "dollar", "bill", "payment", "shopping"],
           char: "💳"
@@ -4897,14 +4897,14 @@ export const Emojis = [
         //   keywords: ["knife", "blade", "cutlery", "kitchen", "weapon"],
         //   char: "🔪"
         // },
-        // dagger: {
-        //   keywords: ["weapon"],
-        //   char: "🗡"
-        // },
-        // crossed_swords: {
-        //   keywords: ["weapon"],
-        //   char: "⚔"
-        // },
+        dagger: {
+          keywords: ["weapon"],
+          char: "🗡"
+        },
+        crossed_swords: {
+          keywords: ["weapon"],
+          char: "⚔"
+        },
         shield: {
           keywords: ["protection", "security"],
           char: "🛡"
@@ -4913,37 +4913,37 @@ export const Emojis = [
         //   keywords: ["kills", "tobacco", "cigarette", "joint", "smoke"],
         //   char: "🚬"
         // },
-        skull_and_crossbones: {
-          keywords: [
-            "poison",
-            "danger",
-            "deadly",
-            "scary",
-            "death",
-            "pirate",
-            "evil"
-          ],
-          char: "☠"
-        },
-        // coffin: {
+        // skull_and_crossbones: {
         //   keywords: [
-        //     "vampire",
-        //     "dead",
-        //     "die",
+        //     "poison",
+        //     "danger",
+        //     "deadly",
+        //     "scary",
         //     "death",
-        //     "rip",
-        //     "graveyard",
-        //     "cemetery",
-        //     "casket",
-        //     "funeral",
-        //     "box"
+        //     "pirate",
+        //     "evil"
         //   ],
-        //   char: "⚰"
+        //   char: "☠"
         // },
-        // funeral_urn: {
-        //   keywords: ["dead", "die", "death", "rip", "ashes"],
-        //   char: "⚱"
-        // },
+        coffin: {
+          keywords: [
+            "vampire",
+            "dead",
+            "die",
+            "death",
+            "rip",
+            "graveyard",
+            "cemetery",
+            "casket",
+            "funeral",
+            "box"
+          ],
+          char: "⚰"
+        },
+        funeral_urn: {
+          keywords: ["dead", "die", "death", "rip", "ashes"],
+          char: "⚱"
+        },
         amphora: {
           keywords: ["vase", "jar"],
           char: "🏺"
@@ -4980,10 +4980,10 @@ export const Emojis = [
           keywords: ["embarrassing"],
           char: "🕳"
         },
-        pill: {
-          keywords: ["health", "medicine", "doctor", "pharmacy", "drug"],
-          char: "💊"
-        },
+        // pill: {
+        //   keywords: ["health", "medicine", "doctor", "pharmacy", "drug"],
+        //   char: "💊"
+        // },
         // syringe: {
         //   keywords: [
         //     "health",
@@ -5009,10 +5009,10 @@ export const Emojis = [
           keywords: ["bacteria", "biology", "culture", "lab"],
           char: "🧫"
         },
-        // test_tube: {
-        //   keywords: ["chemistry", "experiment", "lab", "science"],
-        //   char: "🧪"
-        // },
+        test_tube: {
+          keywords: ["chemistry", "experiment", "lab", "science"],
+          char: "🧪"
+        },
         thermometer: {
           keywords: ["weather", "temperature", "hot", "cold"],
           char: "🌡"
@@ -5078,10 +5078,10 @@ export const Emojis = [
           char: "🛌",
           fitzpatrick_scale: true
         },
-        bed: {
-          keywords: ["sleep", "rest"],
-          char: "🛏"
-        },
+        // bed: {
+        //   keywords: ["sleep", "rest"],
+        //   char: "🛏"
+        // },
         door: {
           keywords: ["house", "entry", "exit"],
           char: "🚪"
@@ -5185,10 +5185,10 @@ export const Emojis = [
           keywords: ["communication", "inbox"],
           char: "📧"
         },
-        // love_letter: {
-        //   keywords: ["email", "like", "affection", "envelope", "valentines"],
-        //   char: "💌"
-        // },
+        love_letter: {
+          keywords: ["email", "like", "affection", "envelope", "valentines"],
+          char: "💌"
+        },
         postbox: {
           keywords: ["email", "letter", "envelope"],
           char: "📮"
@@ -5573,57 +5573,57 @@ export const Emojis = [
           keywords: ["decoration", "love"],
           char: "❣"
         },
-        // two_hearts: {
-        //   keywords: ["love", "like", "affection", "valentines", "heart"],
-        //   char: "💕"
-        // },
-        // revolving_hearts: {
-        //   keywords: ["love", "like", "affection", "valentines"],
-        //   char: "💞"
-        // },
-        // heartbeat: {
-        //   keywords: [
-        //     "love",
-        //     "like",
-        //     "affection",
-        //     "valentines",
-        //     "pink",
-        //     "heart"
-        //   ],
-        //   char: "💓"
-        // },
-        // heartpulse: {
-        //   keywords: ["like", "love", "affection", "valentines", "pink"],
-        //   char: "💗"
-        // },
-        // sparkling_heart: {
-        //   keywords: ["love", "like", "affection", "valentines"],
-        //   char: "💖"
-        // },
-        // cupid: {
-        //   keywords: ["love", "like", "heart", "affection", "valentines"],
-        //   char: "💘"
-        // },
-        // gift_heart: {
-        //   keywords: ["love", "valentines"],
-        //   char: "💝"
-        // },
-        // heart_decoration: {
-        //   keywords: ["purple-square", "love", "like"],
-        //   char: "💟"
-        // },
+        two_hearts: {
+          keywords: ["love", "like", "affection", "valentines", "heart"],
+          char: "💕"
+        },
+        revolving_hearts: {
+          keywords: ["love", "like", "affection", "valentines"],
+          char: "💞"
+        },
+        heartbeat: {
+          keywords: [
+            "love",
+            "like",
+            "affection",
+            "valentines",
+            "pink",
+            "heart"
+          ],
+          char: "💓"
+        },
+        heartpulse: {
+          keywords: ["like", "love", "affection", "valentines", "pink"],
+          char: "💗"
+        },
+        sparkling_heart: {
+          keywords: ["love", "like", "affection", "valentines"],
+          char: "💖"
+        },
+        cupid: {
+          keywords: ["love", "like", "heart", "affection", "valentines"],
+          char: "💘"
+        },
+        gift_heart: {
+          keywords: ["love", "valentines"],
+          char: "💝"
+        },
+        heart_decoration: {
+          keywords: ["purple-square", "love", "like"],
+          char: "💟"
+        },
         peace_symbol: {
           keywords: ["hippie"],
           char: "☮"
         },
-        // latin_cross: {
-        //   keywords: ["christianity"],
-        //   char: "✝"
-        // },
-        // star_and_crescent: {
-        //   keywords: ["islam"],
-        //   char: "☪"
-        // },
+        latin_cross: {
+          keywords: ["christianity"],
+          char: "✝"
+        },
+        star_and_crescent: {
+          keywords: ["islam"],
+          char: "☪"
+        },
         om: {
           keywords: ["hinduism", "buddhism", "sikhism", "jainism"],
           char: "🕉"
@@ -5636,10 +5636,10 @@ export const Emojis = [
           keywords: ["judaism"],
           char: "✡"
         },
-        // six_pointed_star: {
-        //   keywords: ["purple-square", "religion", "jewish", "hexagram"],
-        //   char: "🔯"
-        // },
+        six_pointed_star: {
+          keywords: ["purple-square", "religion", "jewish", "hexagram"],
+          char: "🔯"
+        },
         menorah: {
           keywords: ["hanukkah", "candles", "jewish"],
           char: "🕎"
@@ -5652,10 +5652,10 @@ export const Emojis = [
           keywords: ["suppedaneum", "religion"],
           char: "☦"
         },
-        // place_of_worship: {
-        //   keywords: ["religion", "church", "temple", "prayer"],
-        //   char: "🛐"
-        // },
+        place_of_worship: {
+          keywords: ["religion", "church", "temple", "prayer"],
+          char: "🛐"
+        },
         ophiuchus: {
           keywords: ["sign", "purple-square", "constellation", "astrology"],
           char: "⛎"
@@ -6697,10 +6697,10 @@ export const Emojis = [
           keywords: ["sound", "volume", "mute", "quiet", "silent"],
           char: "🔕"
         },
-        black_joker: {
-          keywords: ["poker", "cards", "game", "play", "magic"],
-          char: "🃏"
-        },
+        // black_joker: {
+        //   keywords: ["poker", "cards", "game", "play", "magic"],
+        //   char: "🃏"
+        // },
         mahjong: {
           keywords: ["game", "play", "chinese", "kanji"],
           char: "🀄"
@@ -8208,10 +8208,10 @@ export const Emojis = [
           keywords: ["un", "flag", "banner"],
           char: "🇺🇳"
         },
-        // pirate_flag: {
-        //   keywords: ["skull", "crossbones", "flag", "banner"],
-        //   char: "🏴‍☠️"
-        // }
+        pirate_flag: {
+          keywords: ["skull", "crossbones", "flag", "banner"],
+          char: "🏴‍☠️"
+        }
       }
     }
   }
