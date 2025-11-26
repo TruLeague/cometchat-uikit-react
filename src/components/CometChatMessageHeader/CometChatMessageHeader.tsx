@@ -606,7 +606,7 @@ export const CometChatMessageHeader = (props: MessageHeaderProps) => {
                     if (onBack) {
                         onBack()
                     }
-                }} className="cometchat-message-header__back-button">
+                }} className={isMobilePanel ? "cometchat-message-header__back-button-mobile" : "cometchat-message-header__back-button"}>
                 </div>
             );
         } catch (error) {
@@ -774,7 +774,7 @@ export const CometChatMessageHeader = (props: MessageHeaderProps) => {
             width: "100%",
             display: "flex"
         }}>
-            <div className="cometchat-message-header" style={messageHeaderStyle}>
+            <div className={`cometchat-message-header ${isMobilePanel ? "cometchat-message-header--mobile" : ""}`} style={messageHeaderStyle}>
                 <div>
                     {getBackButton()}
                     <div className="cometchat-message-header__listitem" style={messageHeaderStyle}>
