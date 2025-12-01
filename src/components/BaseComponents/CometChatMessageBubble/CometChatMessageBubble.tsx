@@ -27,6 +27,7 @@ interface MessageBubbleProps {
   topMenuSize?: number,
   type?: string,
   category?: string,
+  panelType?: string  
 };
 /**
  * React component for displaying different types of messages in the message list.
@@ -49,7 +50,8 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
     alignment = MessageBubbleAlignment.right,
     topMenuSize = 2,
     type, category,
-    setRef
+    setRef,
+    panelType
   } = props;
 
   /**Mapping message types and categories to specific class names
@@ -132,6 +134,8 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
    * Effect to set the message reference when it is available
    *  */
   const [isHovering, setIsHovering] = useState<boolean>(false);
+  const longPressTimeout = useRef<NodeJS.Timeout | null>(null);
+  
   /**
    * Clean up function to clear the timeout when component unmounts
    */
@@ -142,6 +146,9 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
     return () => {
       if (timeoutId) {
         clearTimeout(timeoutId);
+      }
+      if (longPressTimeout.current) {
+        clearTimeout(longPressTimeout.current);
       }
       if (resizeObserver.current) {
         resizeObserver.current.disconnect();
@@ -168,6 +175,23 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
       setIsHovering(true);
       attachIntersectionObserver();
     }
+  
+  /** Handle long press start for mobile */
+  const handleTouchStart = () => {
+    if (isMobile()) {
+      longPressTimeout.current = setTimeout(() => {
+        showMessageOptions();
+      }, 500); // 500ms long press duration
+    }
+  }
+  
+  /** Handle touch end/cancel to clear long press timer */
+  const handleTouchEnd = () => {
+    if (longPressTimeout.current) {
+      clearTimeout(longPressTimeout.current);
+      longPressTimeout.current = null;
+    }
+  }
   /** Function to render the leading view based on alignment*/
   const getLeadingView = () => {
     if (leadingView && alignment === MessageBubbleAlignment.left) {
@@ -240,14 +264,22 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
       setIsHovering(false);
     };
 
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (messageRef.current && !messageRef.current.contains(event.target as Node)) {
+        setIsHovering(false);
+      }
+    };
+
     if (isHovering) {
       getCurrentWindow().addEventListener('overlayclick', handleOverlayClicked as EventListener);
-
+      getCurrentWindow().addEventListener('click', handleClickOutside as EventListener);
+      getCurrentWindow().addEventListener('touchstart', handleClickOutside as EventListener);
     }
 
     return () => {
       getCurrentWindow().removeEventListener('overlayclick', handleOverlayClicked as EventListener);
-
+      getCurrentWindow().removeEventListener('click', handleClickOutside as EventListener);
+      getCurrentWindow().removeEventListener('touchstart', handleClickOutside as EventListener);
     };
   }, [isHovering]);
 
@@ -328,14 +360,18 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
               width: "100%",
               height: "100%",
               background: "inherit"
-            }}   onMouseLeave={hideMessageOptions}>
+            }}   onMouseLeave={panelType !== "mobile" ? hideMessageOptions : undefined}>
               {options && options.length > 0 ?  getMessageOptions() : null}
               <div
                 className="cometchat-message-bubble__body-wrapper"
               >
                 <div
-                   onMouseEnter={showMessageOptions}
+                   onMouseEnter={panelType !== "mobile" ? showMessageOptions : undefined}
+                   onTouchStart={handleTouchStart}
+                   onTouchEnd={handleTouchEnd}
+                   onTouchCancel={handleTouchEnd}
                    onClick={()=>{
+                    if(panelType == "mobile") return;
                       if(!isHovering){
                         showMessageOptions()
                       }

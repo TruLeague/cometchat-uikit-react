@@ -409,6 +409,8 @@ interface MessageListProps {
     * @defaultValue `false`
   */
   isAgentChat?: boolean;
+
+  panelType? : string
 }
 
 const defaultProps: MessageListProps = {
@@ -459,7 +461,7 @@ const defaultProps: MessageListProps = {
   smartRepliesDelayDuration: 10000,
   goToMessageId: "",
   showScrollbar: false,
-  isAgentChat: false
+  isAgentChat: false,
 };
 
 const CometChatMessageList = (props: MessageListProps) => {
@@ -513,7 +515,8 @@ const CometChatMessageList = (props: MessageListProps) => {
     stickyDateTimeFormat,
     goToMessageId,
     showScrollbar,
-    isAgentChat
+    isAgentChat,
+    panelType
   } = { ...defaultProps, ...props };
   /**
    * All the useState useCometChatMessageList are declaired here. These trigger a rerender when updated.
@@ -4236,6 +4239,7 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
           type={item.getDeletedAt() ? CometChatUIKitConstants.MessageTypes.delete : item.getType()}
           category={item.getDeletedAt() ? CometChatUIKitConstants.MessageCategory.action : item.getCategory()}
           topMenuSize={computeQuickOptionsCount(item, quickOptionsCount)}
+          panelType={panelType}
         ></CometChatMessageBubble>
       );
     },
