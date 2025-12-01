@@ -84,6 +84,13 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
   var timeoutId: NodeJS.Timeout | null = null;
   const intersectionObserver = useRef<IntersectionObserver | null>(null);
   const IframeContext = useCometChatFrameContext();
+  
+  // Swipe gesture state
+  const swipeStartX = useRef<number>(0);
+  const swipeStartY = useRef<number>(0);
+  const [swipeOffset, setSwipeOffset] = useState<number>(0);
+  const isSwiping = useRef<boolean>(false);
+  const swipeThreshold = 80; // Minimum swipe distance to trigger reply
 
   const getCurrentWindow = () => {
     return IframeContext?.iframeWindow || window;
@@ -175,6 +182,77 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
       setIsHovering(true);
       attachIntersectionObserver();
     }
+  
+  /** Handle swipe gesture for reply */
+  const handleSwipeStart = (e: React.TouchEvent) => {
+    swipeStartX.current = e.touches[0].clientX;
+    swipeStartY.current = e.touches[0].clientY;
+    isSwiping.current = false;
+    
+    if (isMobile()) {
+      longPressTimeout.current = setTimeout(() => {
+        if (!isSwiping.current) {
+          showMessageOptions();
+        }
+      }, 500);
+    }
+  };
+
+  const handleSwipeMove = (e: React.TouchEvent) => {
+    const currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
+    const deltaX = currentX - swipeStartX.current;
+    const deltaY = currentY - swipeStartY.current;
+    
+    // Detect horizontal swipe (more horizontal than vertical)
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+      isSwiping.current = true;
+      
+      // Clear long press timeout when swiping
+      if (longPressTimeout.current) {
+        clearTimeout(longPressTimeout.current);
+        longPressTimeout.current = null;
+      }
+      
+      // Only allow swipe in the correct direction based on alignment
+      // For incoming messages (left), swipe right
+      // For outgoing messages (right), swipe left
+      if (alignment === MessageBubbleAlignment.left && deltaX > 0) {
+        setSwipeOffset(Math.min(deltaX, swipeThreshold * 1.5));
+      } else if (alignment === MessageBubbleAlignment.right && deltaX < 0) {
+        setSwipeOffset(Math.max(deltaX, -swipeThreshold * 1.5));
+      }
+    }
+  };
+
+  const handleSwipeEnd = () => {
+    // Clear long press timeout
+    if (longPressTimeout.current) {
+      clearTimeout(longPressTimeout.current);
+      longPressTimeout.current = null;
+    }
+    
+    // Trigger reply if swipe threshold is met
+    const absSwipeOffset = Math.abs(swipeOffset);
+    if (absSwipeOffset >= swipeThreshold && isSwiping.current) {
+      triggerReplyAction();
+    }
+    
+    // Reset swipe state
+    setSwipeOffset(0);
+    isSwiping.current = false;
+  };
+
+  const triggerReplyAction = () => {
+    // Find the reply option in the options array
+    const replyOption = options.find(
+      (option) => option.id === CometChatUIKitConstants.MessageOption.replyMessage
+    );
+    
+    if (replyOption && replyOption instanceof CometChatActionsIcon) {
+      replyOption.onClick?.(parseInt(String(id)));
+    }
+  };
   
   /** Handle long press start for mobile */
   const handleTouchStart = () => {
@@ -359,17 +437,42 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
               display: "flex",
               width: "100%",
               height: "100%",
-              background: "inherit"
+              background: "inherit",
+              position: "relative"
             }}   onMouseLeave={panelType !== "mobile" ? hideMessageOptions : undefined}>
               {options && options.length > 0 ?  getMessageOptions() : null}
+              
+              {/* Swipe reply indicator */}
+              {Math.abs(swipeOffset) > 0 && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    [alignment === MessageBubbleAlignment.left ? "left" : "right"]: "10px",
+                    transform: "translateY(-50%)",
+                    opacity: Math.min(Math.abs(swipeOffset) / swipeThreshold, 1),
+                    transition: isSwiping.current ? 'none' : 'opacity 0.2s ease-out',
+                    fontSize: "20px",
+                    pointerEvents: "none",
+                  }}
+                >
+                  ↩️
+                </div>
+              )}
+              
               <div
                 className="cometchat-message-bubble__body-wrapper"
+                style={{
+                  transform: swipeOffset !== 0 ? `translateX(${swipeOffset}px)` : undefined,
+                  transition: isSwiping.current ? 'none' : 'transform 0.2s ease-out',
+                }}
               >
                 <div
                    onMouseEnter={panelType !== "mobile" ? showMessageOptions : undefined}
-                   onTouchStart={handleTouchStart}
-                   onTouchEnd={handleTouchEnd}
-                   onTouchCancel={handleTouchEnd}
+                   onTouchStart={panelType === "mobile" ? handleSwipeStart : handleTouchStart}
+                   onTouchMove={panelType === "mobile" ? handleSwipeMove : undefined}
+                   onTouchEnd={panelType === "mobile" ? handleSwipeEnd : handleTouchEnd}
+                   onTouchCancel={panelType === "mobile" ? handleSwipeEnd : handleTouchEnd}
                    onClick={()=>{
                     if(panelType == "mobile") return;
                       if(!isHovering){
