@@ -410,7 +410,8 @@ interface MessageListProps {
   */
   isAgentChat?: boolean;
 
-  panelType? : string
+  panelType? : string;
+  primaryColor?: string;
 }
 
 const defaultProps: MessageListProps = {
@@ -516,7 +517,8 @@ const CometChatMessageList = (props: MessageListProps) => {
     goToMessageId,
     showScrollbar,
     isAgentChat,
-    panelType
+    panelType,
+    primaryColor
   } = { ...defaultProps, ...props };
   /**
    * All the useState useCometChatMessageList are declaired here. These trigger a rerender when updated.
@@ -1398,6 +1400,7 @@ const CometChatMessageList = (props: MessageListProps) => {
               }
               reactToMessages(args, messageObject);
             }}
+            panelType={panelType}
           />
         }
       } catch (error) {
@@ -4240,6 +4243,7 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
           category={item.getDeletedAt() ? CometChatUIKitConstants.MessageCategory.action : item.getCategory()}
           topMenuSize={computeQuickOptionsCount(item, quickOptionsCount)}
           panelType={panelType}
+          primaryColor={primaryColor}
         ></CometChatMessageBubble>
       );
     },
