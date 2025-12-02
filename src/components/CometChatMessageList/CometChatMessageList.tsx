@@ -49,6 +49,7 @@ import { JSX } from 'react';
 import { useCometChatFrameContext } from "../../context/CometChatFrameContext";
 import { MessageUtils } from "../../utils/MessageUtils";
 import { startStreamingMessage, streamingState$ } from "../../services/stream-message.service";
+import { sendMessageToMobileApp } from "../../utils/MobileBridge";
 
 
 /**
@@ -1429,6 +1430,7 @@ const CometChatMessageList = (props: MessageListProps) => {
             text = getMentionsTextWithoutStyle(message);
           }
           toastTextRef.current = getLocalizedString("message_list_message_copied");
+          sendMessageToMobileApp({ type: 'COPIED_TO_CLIPBOARD', payload: { text: text } });
           setShowToast(true);
           navigator?.clipboard?.writeText(text);
         }
