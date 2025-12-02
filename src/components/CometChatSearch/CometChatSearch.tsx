@@ -690,7 +690,15 @@ export function CometChatSearch(props: SearchProps) {
   const renderResults = () => {
     // If there's no search query and no filters, show initial view
     if ((!searchText || searchText.trim() === "") && activeFilters.length === 0) {
-      return initialView || getDefaultInitialView();
+
+      if (initialView) {
+        return (
+          <div className="cometchat-search__results">
+            {initialView}
+          </div>
+        )
+      }
+      return getDefaultInitialView();
     }
 
     // Check if both sections would be rendered but are empty
