@@ -89,6 +89,19 @@
     cursor: pointer;
 }
 
+.cometchat-message-header__back-button_mobile_app{
+    width: 10px;
+    height: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    -webkit-mask: url('../../assets//mobile-back-vector.svg');
+    -webkit-mask-size: contain;
+    background: white;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
 .cometchat-message-header .cometchat-message-header__conversation-summary-button .cometchat-button {
     background: transparent;
     border: none;

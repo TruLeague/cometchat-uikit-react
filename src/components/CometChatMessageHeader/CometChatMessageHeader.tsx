@@ -601,6 +601,17 @@ export const CometChatMessageHeader = (props: MessageHeaderProps) => {
         try {
         if (hideBackButton && !showBackButton) return null;
 
+            if (panelType?.toLowerCase() === "mobile") {
+                return (
+                    <div onClick={() => {
+                        if (onBack) {
+                            onBack()
+                        }
+                    }} className="cometchat-message-header__back-button_mobile_app">
+                    </div>
+                )
+            }
+
             return (
                 <div onClick={() => {
                     if (onBack) {
