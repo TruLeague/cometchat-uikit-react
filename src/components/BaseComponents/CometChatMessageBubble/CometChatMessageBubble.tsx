@@ -11,6 +11,7 @@ import { StickersConstants } from "../../Extensions/Stickers/StickersConstants";
 import { JSX } from 'react';
 import { useCometChatFrameContext } from '../../../context/CometChatFrameContext';
 import { getLocalizedString } from '../../../resources/CometChatLocalize/cometchat-localize';
+import { sendMessageToMobileApp } from '../../../utils/MobileBridge';
 /**Interface defining the structure for MessageBubbleProps */
 interface MessageBubbleProps {
   id: string | number;
@@ -219,6 +220,9 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
       sheetOffsetRef.current = 0;
       setIsHovering(true);
       attachIntersectionObserver();
+      if (isPanelMobile) {
+        sendMessageToMobileApp({ type: 'BOTTOM_SHEET_OPEN', payload: {} });
+      }
     }
   
   /** Handle swipe gesture for reply */

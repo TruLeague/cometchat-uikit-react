@@ -176,15 +176,15 @@ text-align: left;
     padding: var(--cometchat-padding-2, 8px);
     border: none;
     border-radius: var(--cometchat-radius-2, 10px);
-    background: var(--cometchat-neutral-color-100, #F8F8F8);
+    background: transparent;
     font: inherit;
     color: inherit;
     cursor: pointer;
     transition: background 0.2s ease;
 }
-.cometchat-message-bubble__mobile-options-item:hover {
+/* .cometchat-message-bubble__mobile-options-item:hover {
     background: var(--cometchat-neutral-color-200, #EFEFEF);
-}
+} */
 .cometchat-message-bubble__mobile-options-item-icon {
     width: 24px;
     height: 24px;
