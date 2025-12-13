@@ -48,6 +48,7 @@ import { ComposerId } from "../../utils/MessagesDataSource";
 import { JSX } from 'react';
 import { useCometChatFrameContext } from "../../context/CometChatFrameContext";
 import { MessageUtils } from "../../utils/MessageUtils";
+import { PanelTypeContext } from "../../context/PanelTypeContext";
 import { startStreamingMessage, streamingState$ } from "../../services/stream-message.service";
 import { sendMessageToMobileApp } from "../../utils/MobileBridge";
 
@@ -4650,6 +4651,7 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
   ]);
 
   return (
+  <PanelTypeContext.Provider value={panelType}>
     <>
       <div className="cometchat" style={{
         height: "inherit",
@@ -4746,6 +4748,7 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
         </div>
       )}
     </>
+  </PanelTypeContext.Provider>
   );
 };
 
