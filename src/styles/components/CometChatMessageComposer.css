@@ -311,7 +311,7 @@
 
 .cometchat-message-composer__input-wrapper {
     position: relative;
-    width: 100%;
+    width: calc(100% - 96px);
     justify-content: center;
     align-items: center;
     display: flex;
@@ -325,7 +325,7 @@
     outline: none;
     background: transparent;
     overflow-y: auto;
-    min-height: 30px;
+    min-height: 40px;
     user-select: text;
     white-space: pre-wrap;
     overflow-wrap: break-word;
@@ -398,7 +398,7 @@
 
 /* Icon styling for buttons with no specific class */
  .cometchat-message-composer__buttons .cometchat-button .cometchat-button__icon {
-    background: var(--cometchat-icon-color-secondary);
+    background: var(--secondary-color-TL);
 }
 
  .cometchat-message-composer__buttons .cometchat-button .cometchat-button__icon:hover {
