@@ -120,6 +120,7 @@
     justify-content: center;
     align-items: center;
     gap: 4px;
+    padding: 12px 0;
 }
 
 /* Styling for buttons with no specific class */
@@ -317,6 +318,7 @@
     display: flex;
     border: 1px solid #CBD6E2;
     border-radius: 20px;
+    padding: 2px 0;
 }
 
 /* Message input area */
@@ -332,13 +334,14 @@
     text-align: left;
     box-sizing: border-box;
     /* border-bottom: 1px solid var(--cometchat-border-color-light); */
-    padding: var(--cometchat-padding-2, 8px);
+    padding: var(--cometchat-padding-1, 8px) 0 var(--cometchat-padding-1, 8px) var(--cometchat-padding-4, 16px);
     color: var(--cometchat-text-color-primary);
     text-overflow: ellipsis;
     font: var(--cometchat-font-body-regular);
     max-height: 150px;
     scrollbar-width: none;
     cursor: text;
+    line-height: 24px;
 }
 
 /* Disabled state for composer input (when voice recording is active) */
