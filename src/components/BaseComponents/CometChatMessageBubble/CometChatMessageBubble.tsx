@@ -31,7 +31,8 @@ interface MessageBubbleProps {
   type?: string,
   category?: string,
   panelType?: string,
-  primaryColor?: string
+  primaryColor?: string,
+  disableSwipeGesture?: boolean;
 };
 /**
  * React component for displaying different types of messages in the message list.
@@ -56,7 +57,8 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
     type, category,
     setRef,
     panelType,
-    primaryColor
+    primaryColor,
+    disableSwipeGesture = false,
   } = props;
   const isPanelMobile = panelType === "mobile";
 
@@ -241,6 +243,9 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
   };
 
   const handleSwipeMove = (e: React.TouchEvent) => {
+    if (disableSwipeGesture) {
+      return;
+    }
     const currentX = e.touches[0].clientX;
     const currentY = e.touches[0].clientY;
     const deltaX = currentX - swipeStartX.current;
@@ -274,10 +279,12 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
       longPressTimeout.current = null;
     }
     
-    // Trigger reply if swipe threshold is met
-    const absSwipeOffset = Math.abs(swipeOffset);
-    if (absSwipeOffset >= swipeThreshold && isSwiping.current) {
-      triggerReplyAction();
+    if (!disableSwipeGesture) {
+      // Trigger reply if swipe threshold is met
+      const absSwipeOffset = Math.abs(swipeOffset);
+      if (absSwipeOffset >= swipeThreshold && isSwiping.current) {
+        triggerReplyAction();
+      }
     }
     
     // Reset swipe state

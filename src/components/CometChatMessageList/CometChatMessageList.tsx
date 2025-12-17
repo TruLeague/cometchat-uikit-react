@@ -4241,6 +4241,7 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
           replyView={!isAgentChat && getReplyView(item)}
           includeBottomViewHeight={shouldIncludeBottomViewHeight(item)}
           threadView={!isAgentChat && getBubbleThreadView(item)}
+          disableSwipeGesture={Boolean(parentMessageId)}
           statusInfoView={getStatusInfoView(item)}
           type={item.getDeletedAt() ? CometChatUIKitConstants.MessageTypes.delete : item.getType()}
           category={item.getDeletedAt() ? CometChatUIKitConstants.MessageCategory.action : item.getCategory()}
