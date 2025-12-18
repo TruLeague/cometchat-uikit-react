@@ -2993,25 +2993,31 @@ try {
    */
   function getTextInput(): JSX.Element {
     const isRecording = state.contentToDisplay === "voiceRecording";
+    const hasAttachmentButton = !shouldShowAttachmentButton();
+    const hasAuxiliaryView = !!auxiliaryButtonView;
+    const showFirstButtonsDiv = hasAttachmentButton || hasAuxiliaryView;
+    
     return (
       <div className="cometchat-message-composer__input-container">
-        <div
-          className='cometchat-message-composer__buttons'
-          style={{
-            display: "flex",
-            padding: `${getThemeVariable(
-              "--cometchat-padding-2"
-            )} ${getThemeVariable("--cometchat-padding-2")}`,
-            justifyContent: "space-between",
-            alignItems: "center",
-            alignSelf: "stretch",
-            gap: getThemeVariable("--cometchat-padding-4"),
-          }}
-        >
-          {shouldShowAttachmentButton() ? null : getActionsheetView()}
-          {getAuxiliaryView()}
-        </div>
-        <div className={"cometchat-message-composer__input-wrapper"}>
+        {showFirstButtonsDiv && (
+          <div
+            className='cometchat-message-composer__buttons'
+            style={{
+              display: "flex",
+              padding: `${getThemeVariable(
+                "--cometchat-padding-2"
+              )} ${getThemeVariable("--cometchat-padding-2")}`,
+              justifyContent: "space-between",
+              alignItems: "center",
+              alignSelf: "stretch",
+              gap: getThemeVariable("--cometchat-padding-4"),
+            }}
+          >
+            {hasAttachmentButton && getActionsheetView()}
+            {getAuxiliaryView()}
+          </div>
+        )}
+        <div className={`cometchat-message-composer__input-wrapper ${hasAttachmentButton ? "cometchat-message-composer__input-wrapper--with-attachment" : ""}`}>
         <div
           onKeyUp={onKeyUp}
           onKeyDown={onKeyDown}

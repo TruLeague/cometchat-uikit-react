@@ -120,7 +120,7 @@
     justify-content: center;
     align-items: center;
     gap: 4px;
-    padding: 12px 0;
+    padding: 6px 0;
 }
 
 /* Styling for buttons with no specific class */
@@ -312,13 +312,18 @@
 
 .cometchat-message-composer__input-wrapper {
     position: relative;
-    width: calc(100% - 96px);
+    width: calc(100% - 72px);
     justify-content: center;
     align-items: center;
     display: flex;
     border: 1px solid #CBD6E2;
     border-radius: 20px;
     padding: 4px 0;
+}
+
+/* Width adjustment when attachment button is visible */
+.cometchat-message-composer__input-wrapper--with-attachment {
+    width: calc(100% - 96px);
 }
 
 /* Message input area */
