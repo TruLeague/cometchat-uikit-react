@@ -100,6 +100,7 @@
     background: white;
     background-repeat: no-repeat;
     cursor: pointer;
+    margin-right: 8px;
 }
 
 .cometchat-message-header .cometchat-message-header__conversation-summary-button .cometchat-button {
