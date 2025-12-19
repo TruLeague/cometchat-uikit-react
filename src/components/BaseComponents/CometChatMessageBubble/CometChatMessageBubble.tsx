@@ -626,7 +626,7 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
         ref={messageRef}
       >
         {getLeadingView()}
-        <div className={`cometchat-message-bubble ${getBubbleClassName()}`} id={String(id)}
+          <div className={`cometchat-message-bubble ${getBubbleClassName()} ${isPanelMobile ? "cometchat-message-bubble__panel-mobile" : ""}`} id={String(id)}
         >
           {getHeaderView()}
           <div>

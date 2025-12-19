@@ -47,6 +47,23 @@
     width: 100%;
 }
 
+.cometchat-message-bubble__panel-mobile {
+    flex: 0 0 auto;
+    width: fit-content;
+    max-width: 92%;
+}
+.cometchat-message-bubble__panel-mobile.cometchat-message-bubble-outgoing {
+    margin-left: auto;
+}
+.cometchat-message-bubble__panel-mobile.cometchat-message-bubble-action {
+    margin-left: auto;
+    margin-right: auto;
+}
+.cometchat-message-bubble__panel-mobile .cometchat-message-bubble__body {
+    width: fit-content;
+    max-inline-size: 92vw;
+}
+
 
 /* Alignment for receiver's messages */
 .cometchat-message-bubble-incoming {
