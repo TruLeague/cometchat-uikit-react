@@ -33,6 +33,7 @@ interface MessageBubbleProps {
   panelType?: string,
   primaryColor?: string,
   disableSwipeGesture?: boolean;
+  senderUid?: string;
 };
 /**
  * React component for displaying different types of messages in the message list.
@@ -59,6 +60,7 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
     panelType,
     primaryColor,
     disableSwipeGesture = false,
+    senderUid,
   } = props;
   const isPanelMobile = panelType === "mobile";
 
@@ -357,6 +359,12 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
 
   const handleMobileOptionSelect = useCallback(
     (option: CometChatActionsIcon | CometChatActionsView) => {
+
+      if(panelType == "mobile" && option?.id == "sendMessagePrivately"){
+        sendMessageToMobileApp({ type: 'PRIVATE_CHAT', payload: { senderUid: senderUid } });
+        return ;
+      }
+
       if (option instanceof CometChatActionsIcon) {
         onOptionClicked(option);
       } else if (option instanceof CometChatActionsView && option.customView) {
@@ -364,7 +372,7 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
         setMobileCustomView(viewElement as any ?? null);
       }
     },
-    [closeMobileOptions, onOptionClicked]
+    [closeMobileOptions, onOptionClicked, senderUid]
   );
 
   const handleSheetTouchStart = useCallback((event: React.TouchEvent) => {

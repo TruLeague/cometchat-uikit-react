@@ -4248,6 +4248,7 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
           topMenuSize={computeQuickOptionsCount(item, quickOptionsCount)}
           panelType={panelType}
           primaryColor={primaryColor}
+          senderUid={item?.getSender()?.getUid()}
         ></CometChatMessageBubble>
       );
     },
