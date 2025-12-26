@@ -661,7 +661,7 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
                     pointerEvents: "none",
                   }}
                 >
-                  ↩️
+                  ⤶
                 </div>
               )}
               
