@@ -749,8 +749,8 @@ const CometChatMessageList = (props: MessageListProps) => {
   * All the Private variables are declaired here for internal use.
    */
   const errorHandler = useCometChatErrorHandler(onError);
-  let isFetchingPreviousMessages = false,
-    threadedAlignment: MessageBubbleAlignment = MessageBubbleAlignment.left;
+  const isFetchingPreviousMessagesRef = useRef(false);
+  let threadedAlignment: MessageBubbleAlignment = MessageBubbleAlignment.left;
   const getLoaderHtml: JSX.Element = useMemo(() => {
     if (loadingView) {
       return (
@@ -2145,8 +2145,8 @@ const CometChatMessageList = (props: MessageListProps) => {
           }
         }
 
-        if (!isFetchingPreviousMessages) {
-          isFetchingPreviousMessages = true;
+        if (!isFetchingPreviousMessagesRef.current) {
+          isFetchingPreviousMessagesRef.current = true;
           let targetMessageId = (shouldScrollToMessage && (goToMessageId || quotedMessageId))
             ? Number(goToMessageId || quotedMessageId)
             : messageIdRef.current.prevMessageId;
@@ -2253,7 +2253,7 @@ const CometChatMessageList = (props: MessageListProps) => {
                   }
                 }, 0);
               }
-              isFetchingPreviousMessages = false;
+              isFetchingPreviousMessagesRef.current = false;
               if (messagesList && messagesList.length > 0) {
                 let lastMessage: CometChat.BaseMessage =
                   messagesList[messagesList.length - 1];
@@ -2330,7 +2330,7 @@ const CometChatMessageList = (props: MessageListProps) => {
               }
             },
             (error: CometChat.CometChatException) => {
-              isFetchingPreviousMessages = false;
+              isFetchingPreviousMessagesRef.current = false;
               if (messageList?.length <= 0) {
                 setMessageListState(States.error);
               }
