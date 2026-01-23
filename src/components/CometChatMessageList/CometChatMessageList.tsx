@@ -550,6 +550,7 @@ const CometChatMessageList = (props: MessageListProps) => {
   const [isMessageInProgress, setIsMessageInProgress] = useState<boolean>(false);
   const [hasCompletedInitialLoad, setHasCompletedInitialLoad] = useState<boolean>(isAgentChat && !parentMessageId ? true : false);
   const [isFetchingOlderMessages, setIsFetchingOlderMessages] = useState<boolean>(false);
+  const [hasReachedOldestMessage, setHasReachedOldestMessage] = useState<boolean>(false);
   const [shouldScrollDirectly, setShouldScrollDirectly] = useState<boolean>(true);
   const [hasVisibleArea, setHasVisibleArea] = useState<boolean>(false);
   const [scrollToEnd, setScrollToEnd] = useState<boolean>(false);
@@ -2321,6 +2322,7 @@ const CometChatMessageList = (props: MessageListProps) => {
                 );
               } else {
                 if (messagesList.length === 0) {
+                  setHasReachedOldestMessage(true);
                   if (totalMessagesCountRef.current === 0) {
                     setMessageListState(States.empty);
                   } else if ((!goToMessageId) && !hasCompletedInitialLoad) {
@@ -3330,6 +3332,7 @@ const CometChatMessageList = (props: MessageListProps) => {
     setMessageList([]);
     setHasTargetMessageId(false);
     setShouldScrollToMessage(false);
+    setHasReachedOldestMessage(false);
     fetchPreviousMessages();
   }, [
     fetchPreviousMessages,
@@ -4705,7 +4708,7 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
               scrollToBottom={isAgentChat ? isFirstScroll : scrollListToBottom}
               scrollToEnd={isAgentChat ? scrollToEnd : false}
               topLoaderView={
-                isFetchingOlderMessages && hasCompletedInitialLoad ? (
+                isFetchingOlderMessages && hasCompletedInitialLoad && !hasReachedOldestMessage ? (
                   <div className="cometchat-message-list__older-messages-loader">
                     <div className="cometchat-message-list__older-messages-loader-icon" />
                   </div>
