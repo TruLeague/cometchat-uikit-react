@@ -4685,13 +4685,6 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
           </div>
           <div className="cometchat-message-list__body"
           >
-            {
-            isFetchingOlderMessages && hasCompletedInitialLoad &&
-            (
-              <div className="cometchat-message-list__older-messages-loader">
-                <div className="cometchat-message-list__older-messages-loader-icon" />
-              </div>
-            )}
             <CometChatList
               showShimmerOnTop={(isAgentChat && !parentMessageId) ? false : isMessageRepliedToAvailable ? true : !hasCompletedInitialLoad}
               showScrollbar={showScrollbar}
@@ -4711,6 +4704,13 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
               emptyView={getEmptyHtml}
               scrollToBottom={isAgentChat ? isFirstScroll : scrollListToBottom}
               scrollToEnd={isAgentChat ? scrollToEnd : false}
+              topLoaderView={
+                isFetchingOlderMessages && hasCompletedInitialLoad ? (
+                  <div className="cometchat-message-list__older-messages-loader">
+                    <div className="cometchat-message-list__older-messages-loader-icon" />
+                  </div>
+                ) : null
+              }
             />
           </div>
           {!isMessageInProgress && showScrollToBottom && hasCompletedInitialLoad && hasVisibleArea ? (
