@@ -190,11 +190,6 @@ interface ListProps<T> {
    * 
    */
   scrollToEnd?:boolean;
-  /**
-   * Custom view to display at the top of the list body (e.g., loading older messages indicator)
-   * This renders inside the scrollable area, after the top intersection observer
-   */
-  topLoaderView?: JSX.Element | null;
 }
 /**
  * Renders a list component that can display a title, search bar,
@@ -230,7 +225,6 @@ function List<T>(props: ListProps<T>): JSX.Element {
     showShimmerOnTop = false,
     showScrollbar = false,
     scrollToEnd = false,
-    topLoaderView = null
   } = props;
   // Refs for DOM elements and other states
   const intersectionObserverRootRef = useRef<DivElementRef>(null);
@@ -460,7 +454,6 @@ function List<T>(props: ListProps<T>): JSX.Element {
         </div> : null}
         <div ref={intersectionObserverRootRef} className="cometchat-list__body">
           <div ref={intersectionObserverTopTargetRef} className="cometchat-list__body-intersection-top" style={{ height: "1px", minHeight: "1px" }}></div>
-          {topLoaderView}
           {getList()}
           {showShimmerOnTop ? getLoadingView() : getStateView()}
           <div ref={intersectionObserverBottomTargetRef} className="cometchat-list__body-intersection-bottom" style={{ height: "1px", minHeight: "1px" }}></div>

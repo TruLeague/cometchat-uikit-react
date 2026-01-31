@@ -4680,7 +4680,11 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
               calendarObject={getStickyDateFormat()}
             ></CometChatDate>
           </div> : null}
-
+          {isFetchingOlderMessages && hasCompletedInitialLoad && !hasReachedOldestMessage && (
+            <div className="cometchat-message-list__older-messages-loader">
+              <div className="cometchat-message-list__older-messages-loader-icon" />
+            </div>
+          )}
           <div
             className="cometchat-message-list__header"
           >
@@ -4707,13 +4711,6 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
               emptyView={getEmptyHtml}
               scrollToBottom={isAgentChat ? isFirstScroll : scrollListToBottom}
               scrollToEnd={isAgentChat ? scrollToEnd : false}
-              topLoaderView={
-                isFetchingOlderMessages && hasCompletedInitialLoad && !hasReachedOldestMessage ? (
-                  <div className="cometchat-message-list__older-messages-loader">
-                    <div className="cometchat-message-list__older-messages-loader-icon" />
-                  </div>
-                ) : null
-              }
             />
           </div>
           {!isMessageInProgress && showScrollToBottom && hasCompletedInitialLoad && hasVisibleArea ? (
