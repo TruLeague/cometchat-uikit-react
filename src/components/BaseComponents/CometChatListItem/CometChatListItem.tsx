@@ -81,7 +81,7 @@ const CometChatListItem = (props: ListItemProps) => {
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); listItemClick(e as any); } }}
                 role="button"
                 tabIndex={0}
-                aria-label={title}
+                aria-label={`Open conversation with ${title}`}
             >
                 {!leadingView ?
                     avatarName?.trim()?.length > 0 ||
