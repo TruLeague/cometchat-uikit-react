@@ -26,8 +26,8 @@ const CometChatAvatar = (props: CometChatAvatarProps) => {
     } = props;
 
     const splitName = name.split(" ");
-    const isClickable = typeof onClick === "function";
-    const shouldShowPointer = isClickable && !disablePointer;
+    const hasClickHandler = typeof onClick === "function";
+    const isInteractive = hasClickHandler && !disablePointer;
 
     return (
         <div className="cometchat" style={{
@@ -39,12 +39,11 @@ const CometChatAvatar = (props: CometChatAvatarProps) => {
         }}>
             <div
                 className="cometchat-avatar"
-                onClick={onClick}
-                onKeyDown={isClickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick?.(); } } : undefined}
-                role={isClickable ? "button" : undefined}
-                tabIndex={isClickable ? 0 : undefined}
-                aria-label={isClickable ? `View ${name || 'user'} profile` : undefined}
-                style={shouldShowPointer ? { cursor: "pointer" } : undefined}
+                onClick={isInteractive ? onClick : undefined}
+                style={isInteractive ? { cursor: "pointer" } : undefined}
+                onKeyDown={isInteractive ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick?.(); } } : undefined}
+                role={isInteractive ? "button" : undefined}
+                tabIndex={isInteractive ? 0 : undefined}
             >
                 {image ?
                     <img src={image} className="cometchat-avatar__image" alt={`${name || 'User'} avatar`} />
