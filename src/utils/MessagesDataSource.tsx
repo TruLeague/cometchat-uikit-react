@@ -182,6 +182,9 @@ export class MessagesDataSource implements DataSource {
     if (!additionalParams?.hideReplyOption) {
       messageOptionList.push(this.getReplyOption());
     }
+    if (group && !isSentByMe && !additionalParams?.hideMessagePrivatelyOption) {
+      messageOptionList.push(this.getSendMessagePrivatelyOption());
+    }
     if (!messageObject.getParentMessageId() && !additionalParams?.hideReplyInThreadOption) {
       messageOptionList.push(this.getReplyInThreadOption());
     }
@@ -196,9 +199,6 @@ export class MessagesDataSource implements DataSource {
     }
     if ((isSentByMe || (!isParticipant && group)) && !additionalParams?.hideDeleteMessageOption)
       messageOptionList.push(this.getDeleteOption());
-    if (group && !isSentByMe && !additionalParams?.hideMessagePrivatelyOption) {
-      messageOptionList.push(this.getSendMessagePrivatelyOption());
-    }
     return messageOptionList;
   }
   getIsSentByMe(message: CometChat.BaseMessage) {
@@ -866,9 +866,10 @@ getMessageSentAtDateFormat(messageSentAtDateTimeFormat?:CalendarObject) {
       isParticipant = true;
     }
 
-    if (moderationStatus === CometChatUIKitConstants.moderationStatus.pending) {
-      return [];
-    } else if (moderationStatus === CometChatUIKitConstants.moderationStatus.disapproved) {
+    // if (moderationStatus === CometChatUIKitConstants.moderationStatus.pending) {
+    //   return [];
+    // } else 
+      if (moderationStatus === CometChatUIKitConstants.moderationStatus.disapproved) {
       let isSentByMe: boolean = this.isSentByMe(loggedInUser, messageObject);
       _optionList = [];
       if ((isSentByMe || (!isParticipant && group)) && !additionalParams?.hideDeleteMessageOption)
