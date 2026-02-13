@@ -52,12 +52,12 @@ const CometChatDocumentBubble = (props: DocumentBubbleProps) => {
                         <div
                             className="cometchat-document-bubble__body-content-name"
                         >
-                            <label title={title}>{title}</label>
+                            <span title={title}>{title}</span>
                         </div>
                         {subtitle?.trim() && subtitle.trim()?.length > 0 ?
                             <div
                                 className="cometchat-document-bubble__body-content-description" >
-                                <label title={subtitle}>{subtitle}</label>
+                                <span title={subtitle}>{subtitle}</span>
                             </div> : null}
                     </div>
 

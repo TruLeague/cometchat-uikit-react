@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useId } from "react";
 import { useCometChatRadioButton } from "./useCometChatRadioButton";
 interface RadioButtonProps {
     /* default value of the radio button. */
@@ -29,19 +29,30 @@ const CometChatRadioButton = (props: RadioButtonProps) => {
         onRadioButtonChanged = () => { },
     } = props;
     const [isChecked, setIsChecked] = useState(checked);
+    const generatedId = useId();
+    const radioId = id || `radio-${generatedId}`;
 
     useEffect(() => {
         setIsChecked(checked);
     }, [checked]);
 
-    const { updateRadioState } = useCometChatRadioButton({ checked, onRadioButtonChanged, id, name });
+    const { updateRadioState } = useCometChatRadioButton({ checked, onRadioButtonChanged, id: radioId, name });
 
     return (
         <div className="cometchat">
-            <div className="cometchat-radiobutton">
-                <label className="cometchat-radiobutton__label">
-                    <input type="radio" name={name} onChange={updateRadioState} disabled={disabled} value={id} />
-                    <span className="cometchat-radiobutton__selected"></span>
+            <div className="cometchat-radiobutton" role="radio" aria-checked={isChecked}>
+                <label className="cometchat-radiobutton__label" htmlFor={radioId}>
+                    <input
+                        type="radio"
+                        id={radioId}
+                        name={name}
+                        onChange={updateRadioState}
+                        disabled={disabled}
+                        checked={isChecked}
+                        value={radioId}
+                        aria-disabled={disabled}
+                    />
+                    <span className="cometchat-radiobutton__selected" aria-hidden="true"></span>
                     {labelText}
                 </label>
             </div>
