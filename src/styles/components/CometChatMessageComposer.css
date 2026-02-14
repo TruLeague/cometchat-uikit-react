@@ -349,6 +349,16 @@
     line-height: 24px;
 }
 
+/* Remove outline on mouse click focus - only show on Tab navigation */
+.cometchat-message-composer__input:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Input wrapper - remove outline on mouse click */
+.cometchat-message-composer__input-wrapper:focus:not(:focus-visible) {
+    outline: none;
+}
+
 /* Disabled state for composer input (when voice recording is active) */
 .cometchat-message-composer__input-disabled {
     opacity: 0.5;
