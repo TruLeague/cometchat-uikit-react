@@ -452,11 +452,6 @@ Define border colors for UI elements,
   border: 0 !important;
 }
 
-/* Focus visible styles for keyboard navigation (WCAG 2.4.7) */
-.cometchat *:focus-visible {
-  outline: 2px solid var(--cometchat-primary-color, #3399FF);
-  outline-offset: 2px;
-}
 
 /* Skip link for keyboard users (WCAG 2.4.1) */
 .cometchat-skip-link {
