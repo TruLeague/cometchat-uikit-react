@@ -235,12 +235,20 @@ const CometChatAudioBubble = (props: AudioBubbleProps) => {
     // Function to generate the progress bar view
     const getProgressBar = useCallback(() => {
         return (
-            <div className="cometchat-audio-bubble__tail-view-download-progress">
+            <div
+                className="cometchat-audio-bubble__tail-view-download-progress"
+                role="progressbar"
+                aria-valuenow={progress}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`Downloading audio: ${progress}%`}
+            >
                 <svg
                     width="24"
                     height="24"
                     viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
                 >
                     <circle
                         cx="12"
@@ -257,7 +265,19 @@ const CometChatAudioBubble = (props: AudioBubbleProps) => {
                     />
                 </svg>
 
-                <button type="button" className="cometchat-audio-bubble__tail-view-download-stop" onClick={cancelDownload} aria-label="Cancel download"></button>
+                <div
+                    className="cometchat-audio-bubble__tail-view-download-stop"
+                    onClick={cancelDownload}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Cancel download"
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            cancelDownload();
+                        }
+                    }}
+                ></div>
             </div>
         );
     }, [isDownloading, progress]);
@@ -267,17 +287,46 @@ const CometChatAudioBubble = (props: AudioBubbleProps) => {
             height: "fit-content",
             width: "fit-content"
         }}>
-            <div className={`cometchat-audio-bubble ${isSentByMe ? "cometchat-audio-bubble-outgoing" : "cometchat-audio-bubble-incoming"}`} style={isLoading ? {cursor:"not-allowed"} : {}}>
+            <div
+                className={`cometchat-audio-bubble ${isSentByMe ? "cometchat-audio-bubble-outgoing" : "cometchat-audio-bubble-incoming"}`}
+                style={isLoading ? {cursor:"not-allowed"} : {}}
+                role="region"
+                aria-label="Audio message"
+            >
                <div>
                <div className="cometchat-audio-bubble__leading-view" style={isLoading ? {pointerEvents:"none"} : {}}  >
                     {isPlaying ? (
-                        <button type="button" className="cometchat-audio-bubble__leading-view-pause" onClick={handlePlayPause} aria-label="Pause audio"></button>
+                        <div
+                            className="cometchat-audio-bubble__leading-view-pause"
+                            onClick={handlePlayPause}
+                            role="button"
+                            tabIndex={0}
+                            aria-label="Pause audio"
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    handlePlayPause();
+                                }
+                            }}
+                        ></div>
                     ) : (
-                        <button type="button" className="cometchat-audio-bubble__leading-view-play" onClick={handlePlayPause} aria-label="Play audio"></button>
+                        <div
+                            className="cometchat-audio-bubble__leading-view-play"
+                            onClick={handlePlayPause}
+                            role="button"
+                            tabIndex={0}
+                            aria-label="Play audio"
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    handlePlayPause();
+                                }
+                            }}
+                        ></div>
                     )}
                 </div>
                 <div className="cometchat-audio-bubble__body">
-                    <div className="cometchat-audio-bubble__body-wave" ref={waveformRef}></div>
+                    <div className="cometchat-audio-bubble__body-wave" ref={waveformRef} aria-hidden="true"></div>
                     <div className="cometchat-audio-bubble__body-time">
                         {formatTime(currentTime)} / {formatTime(duration)}
                     </div>
@@ -285,7 +334,19 @@ const CometChatAudioBubble = (props: AudioBubbleProps) => {
                </div>
                 <div className="cometchat-audio-bubble__tail-view" style={isLoading ? {pointerEvents:"none"} : !isDownloading ? { display: 'flex', alignSelf: 'center' } : {}} >
                     {isDownloading ? getProgressBar() : (
-                        <button type="button" className="cometchat-audio-bubble__tail-view-download" onClick={downloadAudio} aria-label="Download audio"></button>
+                        <div
+                            className="cometchat-audio-bubble__tail-view-download"
+                            onClick={downloadAudio}
+                            role="button"
+                            tabIndex={0}
+                            aria-label="Download audio"
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    downloadAudio();
+                                }
+                            }}
+                        ></div>
                     )}
                 </div>
             </div>
