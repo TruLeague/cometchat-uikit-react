@@ -34,6 +34,18 @@ const CometChatEmojiKeyboard = (props: EmojiKeyboardProps) => {
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
+  const focusFirstEmoji = useCallback((categoryId: string) => {
+    setTimeout(() => {
+      const categoryElement = document.getElementById(categoryId);
+      if (categoryElement) {
+        const firstEmoji = categoryElement.nextElementSibling?.querySelector(
+          ".cometchat-emoji-keyboard__list-item",
+        ) as HTMLElement;
+        firstEmoji?.focus({ preventScroll: true });
+      }
+    }, 150);
+  }, []);
+
   useEffect(() => {
     getEmojiCategory();
   }, []);
@@ -133,11 +145,13 @@ const CometChatEmojiKeyboard = (props: EmojiKeyboardProps) => {
                 key={counter + emoji.id}
                 onClick={() => {
                   scrollToElement(emoji.id);
+                  focusFirstEmoji(emoji.id);
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     scrollToElement(emoji.id);
+                    focusFirstEmoji(emoji.id);
                   }
                 }}
                 title={getLocalizedString(emoji.name)}
