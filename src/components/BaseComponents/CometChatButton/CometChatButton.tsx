@@ -1,4 +1,4 @@
-import { MouseEvent, useId } from "react";
+import { MouseEvent } from "react";
 import LoadingIcon from '../../../assets/loading_animation.svg'
 interface ButtonProps {
     text?: string,
@@ -50,7 +50,7 @@ const CometChatButton = (props: ButtonProps) => {
                             className={`${iconURL ? "cometchat-button__icon-default cometchat-button__icon" : "cometchat-button__icon"}`}
                             aria-hidden="true"
                         />
-                        {text && <span className="cometchat-button__text">{text}</span>}
+                        {text && <label className="cometchat-button__text">{text}</label>}
                     </>
                 )}
             </button>
