@@ -36,13 +36,13 @@ const CometChatFileBubble = (props: FileBubbleProps) => {
     const [isDownloading, setIsDownloading] = useState(false);
     const abortControllerRef = useRef<AbortController | null>(null);
 
-    const getAttachmentFileName = () => {
+    const getAttachmentFileName = useCallback(() => {
         if (title) {
             return title;
         }
         const urlParts = fileURL.split("/");
         return urlParts[urlParts.length - 1] || "File";
-    };
+    }, [title, fileURL]);
 
     /**
      * Function to download the file and show download progress bar
@@ -115,9 +115,16 @@ const CometChatFileBubble = (props: FileBubbleProps) => {
       */
     const getProgressBar = useCallback(() => {
         return (
-            <div className="cometchat-file-bubble__tail-view-download-progress
-">
-                <svg>
+            <div
+                className="cometchat-file-bubble__tail-view-download-progress
+"
+                role="progressbar"
+                aria-valuenow={progress}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`Downloading ${getAttachmentFileName()}: ${progress}%`}
+            >
+                <svg aria-hidden="true">
                     <circle
                         cx="10"
                         cy="10"
@@ -135,10 +142,24 @@ const CometChatFileBubble = (props: FileBubbleProps) => {
                         }}
                     ></circle>
                 </svg>
-                <button type="button" className="cometchat-file-bubble__tail-view-download-stop" onClick={cancelDownload} aria-label="Cancel download"></button>
+                <div
+                    className="cometchat-file-bubble__tail-view-download-stop-wrapper"
+                    onClick={cancelDownload}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Cancel download"
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            cancelDownload();
+                        }
+                    }}
+                >
+                    <div className="cometchat-file-bubble__tail-view-download-stop"></div>
+                </div>
             </div>
         )
-    }, [isDownloading, progress])
+    }, [isDownloading, progress, getAttachmentFileName])
 
 
     return (
@@ -157,7 +178,23 @@ const CometChatFileBubble = (props: FileBubbleProps) => {
 
                 <div className="cometchat-file-bubble__tail-view">
 
-                    {isDownloading ? getProgressBar() : <button type="button" className="cometchat-file-bubble__tail-view-download" onClick={downloadFile} aria-label="Download file"></button>}
+                    {isDownloading ? getProgressBar() : (
+                        <div
+                            className="cometchat-file-bubble__tail-view-download-wrapper"
+                            onClick={downloadFile}
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`Download ${getAttachmentFileName()}`}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    downloadFile();
+                                }
+                            }}
+                        >
+                            <div className="cometchat-file-bubble__tail-view-download"></div>
+                        </div>
+                    )}
                 </div>
             </div >
         </div>
