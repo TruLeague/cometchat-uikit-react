@@ -58,6 +58,7 @@ const CometChatContextMenu = (props: ContextMenuProps) => {
     const menuItemRefs = useRef<(HTMLDivElement | null)[]>([]);
     const parentViewRef = useRef<HTMLDivElement | null>(null);
     const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const getPopoverPositionStyleRef = useRef<() => void>(() => {});
     const IframeContext = useCometChatFrameContext();
     
     const getCurrentWindow = ()=>{
@@ -169,6 +170,7 @@ const CometChatContextMenu = (props: ContextMenuProps) => {
     const handleMoreButtonKeyDown = useCallback((e: React.KeyboardEvent) => {
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
+            getPopoverPositionStyleRef.current();
             handleMenuClick();
             // Focus first item when opening
             if (!showSubMenu) {
@@ -178,6 +180,7 @@ const CometChatContextMenu = (props: ContextMenuProps) => {
             }
         } else if (e.key === 'ArrowDown' && !showSubMenu) {
             e.preventDefault();
+            getPopoverPositionStyleRef.current();
             handleMenuClick();
             requestAnimationFrame(() => {
                 setFocusedIndex(0);
@@ -623,6 +626,10 @@ const CometChatContextMenu = (props: ContextMenuProps) => {
             setPositionStyleState(positionStyle);
         }
     }, [showSubMenu, positionStyleState, calculatePopoverPosition, useParentContainer, useParentHeight, setMenuHeight, calculateMenuPosition, getAvailablePlacement]);
+
+    useEffect(() => {
+        getPopoverPositionStyleRef.current = getPopoverPositionStyle;
+    }, [getPopoverPositionStyle]);
         
     function getFullScreenOverlay() {
         return <div
