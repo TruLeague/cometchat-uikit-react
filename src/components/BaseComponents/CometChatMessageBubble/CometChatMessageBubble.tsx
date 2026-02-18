@@ -522,9 +522,9 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
     if (isPanelMobile) {
       return getMobileOptionsSheet();
     }
-    const visibilityStyles = showOptions
-  ? { opacity: 1, pointerEvents: 'auto' as const }
-  : { opacity: 0, pointerEvents: 'none' as const };
+    if (!showOptions) {
+      return null;
+    }
     var optionHeight = "fit-content";
     if (bodyViewRef.current) {
       const height = bodyViewRef.current.clientHeight;
@@ -535,15 +535,14 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
       <div
         className="cometchat-message-bubble__options"
         style={{
-          transition: showOptions ? 'opacity 0.2s ease-in-out' : 'opacity 0s ease-in-out',
-          ...visibilityStyles,
-          ...(showOptions && (footerView || (!includeBottomViewHeight && bottomView) || threadView ) && style)
+          animation: 'cometchat-fade-in 0.2s ease-in-out',
+          ...((footerView || (!includeBottomViewHeight && bottomView) || threadView ) && style)
         }}
       >
         <CometChatContextMenu
           disableBackgroundInteraction={true}
           useParentContainer={true}
-          key={showOptions ? 'hovered' : 'not-hovered'}
+          key={'hovered'}
           topMenuSize={topMenuSize}
           data={options}
           onOptionClicked={onOptionClicked}

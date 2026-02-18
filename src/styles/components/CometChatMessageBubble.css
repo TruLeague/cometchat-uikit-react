@@ -259,6 +259,12 @@ text-align: left;
     outline: none;
 }
 
+/* Fade-in animation for message options on mount */
+@keyframes cometchat-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
 /* High contrast mode support */
 @media (forced-colors: active) {
     .cometchat-message-bubble__body:focus-visible {
