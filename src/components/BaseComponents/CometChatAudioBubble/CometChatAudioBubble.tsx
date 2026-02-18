@@ -277,7 +277,9 @@ const CometChatAudioBubble = (props: AudioBubbleProps) => {
                             cancelDownload();
                         }
                     }}
-                ></div>
+                >
+                    <span className="cometchat-audio-bubble__tail-view-download-stop-icon" aria-hidden="true" />
+                </div>
             </div>
         );
     }, [isDownloading, progress]);
@@ -308,7 +310,9 @@ const CometChatAudioBubble = (props: AudioBubbleProps) => {
                                     handlePlayPause();
                                 }
                             }}
-                        ></div>
+                        >
+                            <span className="cometchat-audio-bubble__leading-view-pause-icon" aria-hidden="true" />
+                        </div>
                     ) : (
                         <div
                             className="cometchat-audio-bubble__leading-view-play"
@@ -322,7 +326,9 @@ const CometChatAudioBubble = (props: AudioBubbleProps) => {
                                     handlePlayPause();
                                 }
                             }}
-                        ></div>
+                        >
+                            <span className="cometchat-audio-bubble__leading-view-play-icon" aria-hidden="true" />
+                        </div>
                     )}
                 </div>
                 <div className="cometchat-audio-bubble__body">
@@ -346,7 +352,9 @@ const CometChatAudioBubble = (props: AudioBubbleProps) => {
                                     downloadAudio();
                                 }
                             }}
-                        ></div>
+                        >
+                            <span className="cometchat-audio-bubble__tail-view-download-icon" aria-hidden="true" />
+                        </div>
                     )}
                 </div>
             </div>
