@@ -946,7 +946,12 @@ export function CometChatGroupMembers(props: GroupMembersProps) {
       ) {
 
         return (
-          <div className="cometchat-group-members__backdrop">
+          <div 
+            className="cometchat-group-members__backdrop"
+            role="dialog"
+            aria-modal="true"
+            aria-label={getLocalizedString("change_scope") || "Change member scope"}
+          >
             <CometChatChangeScope
               options={groupMemberAllowedScopes}
               defaultSelection={groupMemberToChangeScopeOf.getScope()}
@@ -978,9 +983,9 @@ export function CometChatGroupMembers(props: GroupMembersProps) {
       if (loadingView) {
         return loadingView
       }
-      return <div className="cometchat-group-members__shimmer">
+      return <div className="cometchat-group-members__shimmer" role="status" aria-label={getLocalizedString("loading") || "Loading group members"}>
         {[...Array(15)].map((_, index) => (
-          <div key={index} className="cometchat-group-members__shimmer-item">
+          <div key={index} className="cometchat-group-members__shimmer-item" aria-hidden="true">
             <div className="cometchat-group-members__shimmer-item-avatar"></div>
             <div className="cometchat-group-members__shimmer-item-title"></div>
           </div>
@@ -1080,6 +1085,8 @@ export function CometChatGroupMembers(props: GroupMembersProps) {
     <div className="cometchat" style={{ width: "100%", height: "100%" }}>
       <div
         className={`cometchat-group-members ${!showScrollbar ? 'cometchat-group-members-hide-scrollbar' : ''}`}
+        role="region"
+        aria-label={getLocalizedString("group_members") || "Group members"}
       >
         <CometChatList
           showScrollbar={showScrollbar}
@@ -1107,8 +1114,12 @@ export function CometChatGroupMembers(props: GroupMembersProps) {
 
         />
         {isFetchingMore && hasMoreMembers && (
-          <div className="cometchat-group-members__loading-more">
-            <div className="cometchat-group-members__loading-more-icon" />
+          <div 
+            className="cometchat-group-members__loading-more"
+            role="status"
+            aria-label={getLocalizedString("loading") || "Loading more members"}
+          >
+            <div className="cometchat-group-members__loading-more-icon" aria-hidden="true" />
           </div>
         )}
         {getGroupMemberScopeChangeModal()}
