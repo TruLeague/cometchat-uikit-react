@@ -607,11 +607,25 @@ export const CometChatMessageHeader = (props: MessageHeaderProps) => {
 
             if (panelType?.toLowerCase() === "mobile") {
                 return (
-                    <div onClick={() => {
-                        if (onBack) {
-                            onBack()
-                        }
-                    }} className="cometchat-message-header__back-button_mobile_app">
+                    <div
+                        onClick={() => {
+                            if (onBack) {
+                                onBack();
+                            }
+                        }}
+                        className="cometchat-message-header__back-button_mobile_app-wrapper"
+                        role="button"
+                        aria-label="Back"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                                if (onBack) {
+                                    onBack();
+                                }
+                            }
+                        }}
+                    >
+                        <div className="cometchat-message-header__back-button_mobile_app" />
                     </div>
                 )
             }

@@ -1,3 +1,21 @@
+/* Wrapper for the mobile app back button to allow focus/outline and touch accessibility */
+.cometchat-message-header__back-button_mobile_app-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    /* Increase touch target size for accessibility */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+}
+
+.cometchat-message-header__back-button_mobile_app {
+    margin: 0;
+}
 /* Container for the message header, aligning items horizontally */
 
 .cometchat-message-header {
