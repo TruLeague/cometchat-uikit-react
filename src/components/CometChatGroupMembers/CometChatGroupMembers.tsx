@@ -887,22 +887,25 @@ export function CometChatGroupMembers(props: GroupMembersProps) {
   ): JSX.Element {
     try {
       const status = groupMember.getStatus()
+      const listItemProps: any = {
+        id: groupMember.getUid(),
+        title: groupMember.getName(),
+        leadingView: leadingView?.(groupMember),
+        titleView: titleView?.(groupMember),
+        avatarURL: groupMember.getAvatar(),
+        avatarName: groupMember.getName(),
+        subtitleView: subtitleView?.(groupMember),
+        trailingView: getDefaultListItemTailView(groupMember),
+        menuView: !trailingView ? getDefaultListItemMenuView(groupMember) : null,
+      };
+      if (typeof onItemClick === 'function') {
+        listItemProps.onListItemClicked = () => onItemClick(groupMember);
+      }
       return (
         <div
           className={`cometchat-group-members__list-item ${!hideUserStatus ? `cometchat-group-members__list-item-${status}` : ''}`}
         >
-          <CometChatListItem
-            id={groupMember.getUid()}
-            title={groupMember.getName()}
-            leadingView={leadingView?.(groupMember)}
-            titleView={titleView?.(groupMember)}
-            avatarURL={groupMember.getAvatar()}
-            avatarName={groupMember.getName()}
-            subtitleView={subtitleView?.(groupMember)}
-            trailingView={getDefaultListItemTailView(groupMember)}
-            menuView={!trailingView ? getDefaultListItemMenuView(groupMember) : null}
-            onListItemClicked={(e) => onItemClick?.(groupMember)}
-          />
+          <CometChatListItem {...listItemProps} />
         </div>
       );
     } catch (error) {
