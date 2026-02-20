@@ -173,6 +173,14 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
   const [isHovering, setIsHovering] = useState<boolean>(false);
   const [hasFocusWithin, setHasFocusWithin] = useState<boolean>(false);
   const [mobileCustomView, setMobileCustomView] = useState<JSX.Element | null>(null);
+  const [bubbleAriaLabel, setBubbleAriaLabel] = useState<string>("");
+
+  useEffect(() => {
+    if (bodyViewRef.current) {
+      const textContent = bodyViewRef.current.textContent?.trim() || "";
+      setBubbleAriaLabel(textContent || "Message");
+    }
+  });
   const longPressTimeout = useRef<NodeJS.Timeout | null>(null);
   const focusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const closeMobileOptions = useCallback(() => {
@@ -713,8 +721,7 @@ const CometChatMessageBubble = (props: MessageBubbleProps) => {
                    }}
                    ref={bodyViewRef}
                    tabIndex={0}
-                   role="article"
-                   aria-label="Message"
+                   aria-label={bubbleAriaLabel}
                   className={`cometchat-message-bubble__body ${getBubbleTypeClassName()}`}
                 >
                   {replyView ? <div className="cometchat-message-bubble__body-reply-view"> {replyView}</div> : null}
