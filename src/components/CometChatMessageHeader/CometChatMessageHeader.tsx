@@ -221,7 +221,6 @@ export const CometChatMessageHeader = (props: MessageHeaderProps) => {
     const userRef = useRefSync(user);
     const groupRef = useRefSync(group);
     const classNameRef = useRef("");
-    const isOnlineRef = useRef(false);
     const isTypingRef = useRef(false);
     const onErrorCallback = useCometChatErrorHandler(onError);
     /**
@@ -363,10 +362,8 @@ export const CometChatMessageHeader = (props: MessageHeaderProps) => {
     const updateLastActiveInfo = (user: CometChat.User) => {
         try {
             if (user.getStatus() === CometChatUIKitConstants.userStatusType.online) {
-                isOnlineRef.current = true;
                 setSubtitleText(getLocalizedString(`message_header_status_${user.getStatus().toLowerCase()}`));
             } else {
-                isOnlineRef.current = false;
                 if (user.getLastActiveAt()) {
                     const date = user.getLastActiveAt().toString().length === 10 ? user.getLastActiveAt() :   Math.floor(user.getLastActiveAt() / 1000);
                     let formattedDate = CometChatLocalize.formatDate(date,getDateFormat());
@@ -562,14 +559,13 @@ export const CometChatMessageHeader = (props: MessageHeaderProps) => {
      * Otherwise, it checks if the user is blocked and returns a default subtitle if not blocked.
      */
     const getSubtitleView = useCallback(() => {
-        try {
+       try {
             if (subtitleView) {
                 return subtitleView;
             }
             let userBlockedFlag = new MessageUtils().getUserStatusVisible(userRef.current);
-            const onlineClass = isOnlineRef.current ? "cometchat-message-header__subtitle--online" : "";
             return !userBlockedFlag && subtitleText ? (
-                <div className={`cometchat-message-header__subtitle ${classNameRef.current ?? ""} ${onlineClass}`}>
+                <div className={`cometchat-message-header__subtitle ${classNameRef.current ?? ""}`}>
                     {subtitleText}
                 </div>
             ) : null;
