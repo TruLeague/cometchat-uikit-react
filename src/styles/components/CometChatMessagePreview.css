@@ -23,7 +23,7 @@
 
 
 .cometchat-message-bubble-incoming .cometchat-message-preview {
-  background-color: var(--cometchat-neutral-color-400);
+  background-color: #F5F8FA;
   color: var(--cometchat-primary-color);
 }
 
