@@ -194,7 +194,7 @@ export const CometChatMessageHeader = (props: MessageHeaderProps) => {
         showBackButton = false,
         showSearchOption = false,
         onSearchOptionClicked = () => {},
-        onItemClick = () => {},
+        onItemClick,
         panelType,
         mobilePanelBackgroundColor
     } = props;
