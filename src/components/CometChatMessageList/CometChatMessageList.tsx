@@ -3551,7 +3551,7 @@ const CometChatMessageList = (props: MessageListProps) => {
               break;
             }
             default:
-              updateMessage(message, true);
+              updateMessage(CometChatUIKitUtility.clone(message), true);
               if (isThreadOfCurrentChatForUIEvent(message)) {
                 updateReplyCount(CometChatUIKitUtility.clone(message));
               }
@@ -4294,7 +4294,12 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
       getStatusInfoView,
       getMessageOptions,
       getBottomView,
-      quickOptionsCount
+      quickOptionsCount,
+      isAgentChat,
+      getReplyView,
+      panelType,
+      primaryColor,
+      parentMessageId
     ]
   );
 
@@ -4387,7 +4392,9 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
       setBubbleAlignment,
       goToMessageId,
       messageRepliedTo,
-      isAgentChat
+      isAgentChat,
+      getMessageBubbleDateHeader,
+      quickOptionsCount
     ]
   );
   /**
