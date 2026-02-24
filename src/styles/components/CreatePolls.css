@@ -190,7 +190,7 @@
   font: var(--cometchat-font-button-medium);
   font-style: normal;
   line-height: 120%;
-  background: var(--cometchat-primary-button-background, #6852D6);
+  background: var(--primary-color, #6852D6);
   border-radius: var(--cometchat-radius-2, 8px);
   display: flex;
   align-items: center;
