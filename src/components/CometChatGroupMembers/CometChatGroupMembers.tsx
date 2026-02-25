@@ -484,10 +484,12 @@ export function CometChatGroupMembers(props: GroupMembersProps) {
   }, [roleTabs, state.groupMemberList]);
 
   // Visible tabs = tabs with >0 members
+  // During search, keep all configured tabs visible so the active tab doesn't disappear
   const visibleRoleTabs = useMemo(() => {
     if (!roleTabs || !roleTabBuckets) return [];
+    if (state.searchText) return roleTabs;
     return roleTabs.filter((tab) => (roleTabBuckets[tab.key]?.length ?? 0) > 0);
-  }, [roleTabs, roleTabBuckets]);
+  }, [roleTabs, roleTabBuckets, state.searchText]);
 
   // Auto-select first visible tab
   useEffect(() => {
@@ -1055,6 +1057,13 @@ export function CometChatGroupMembers(props: GroupMembersProps) {
             role="dialog"
             aria-modal="true"
             aria-label={getLocalizedString("change_scope") || "Change member scope"}
+            tabIndex={-1}
+            ref={(el) => el?.focus()}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                handleChangeScopeClose();
+              }
+            }}
           >
             <CometChatChangeScope
               options={groupMemberAllowedScopes}
@@ -1223,40 +1232,50 @@ export function CometChatGroupMembers(props: GroupMembersProps) {
             })}
           </div>
         )}
-        <CometChatList
-          showScrollbar={showScrollbar}
-          searchPlaceholderText={searchPlaceholderTextRef.current}
-          searchText={state.searchText}
-          onSearch={onSearchTextChange}
-          hideSearch={hideSearch}
-          list={displayList}
-          listItemKey='getUid'
-          itemView={getListItem()}
-          showSectionHeader={false}
-          onScrolledToBottom={() =>
-            fetchNextAndAppendGroupMembers(
-              (fetchNextIdRef.current =
-                "onScrolledToBottom_" + String(Date.now())),
-                true
-            )
-          }
-          state={state.fetchState === States.loaded && state.groupMemberList.length === 0 ? States.empty : state.fetchState}
-          loadingView={getLoadingView()}
-          emptyView={getEmptyView()}
-          errorView={getErrorView()}
-          hideError={hideError}
-          headerView={headerView}
+        <div
+          {...(visibleRoleTabs.length > 1 && activeRoleTabKey ? {
+            role: "tabpanel",
+            id: `cometchat-role-tabpanel-${activeRoleTabKey}`,
+            "aria-labelledby": `cometchat-role-tab-${activeRoleTabKey}`,
+            tabIndex: 0,
+          } : {})}
+          style={{ display: "contents" }}
+        >
+          <CometChatList
+            showScrollbar={showScrollbar}
+            searchPlaceholderText={searchPlaceholderTextRef.current}
+            searchText={state.searchText}
+            onSearch={onSearchTextChange}
+            hideSearch={hideSearch}
+            list={displayList}
+            listItemKey='getUid'
+            itemView={getListItem()}
+            showSectionHeader={false}
+            onScrolledToBottom={() =>
+              fetchNextAndAppendGroupMembers(
+                (fetchNextIdRef.current =
+                  "onScrolledToBottom_" + String(Date.now())),
+                  true
+              )
+            }
+            state={state.fetchState === States.loaded && displayList.length === 0 ? States.empty : state.fetchState}
+            loadingView={getLoadingView()}
+            emptyView={getEmptyView()}
+            errorView={getErrorView()}
+            hideError={hideError}
+            headerView={headerView}
 
-        />
-        {isFetchingMore && hasMoreMembers && (
-          <div 
-            className="cometchat-group-members__loading-more"
-            role="status"
-            aria-label={getLocalizedString("loading") || "Loading more members"}
-          >
-            <div className="cometchat-group-members__loading-more-icon" aria-hidden="true" />
-          </div>
-        )}
+          />
+          {isFetchingMore && hasMoreMembers && (
+            <div 
+              className="cometchat-group-members__loading-more"
+              role="status"
+              aria-label={getLocalizedString("loading") || "Loading more members"}
+            >
+              <div className="cometchat-group-members__loading-more-icon" aria-hidden="true" />
+            </div>
+          )}
+        </div>
         {getGroupMemberScopeChangeModal()}
       </div>
 
