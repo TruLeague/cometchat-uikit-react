@@ -74,6 +74,10 @@
   justify-content: center;
 }
 
+.cometchat-group-members__backdrop:focus {
+  outline: none;
+}
+
 
 .cometchat-group-members-hide-scrollbar .cometchat-list__body::-webkit-scrollbar {
   background: transparent;
@@ -153,6 +157,7 @@
 .cometchat-group-members__empty-state-view {
   display: flex;
   flex-direction: column;
+  padding: 20px 0;
 }
 
 .cometchat-group-members__empty-state-view,
