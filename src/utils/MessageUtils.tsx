@@ -95,8 +95,8 @@ export class MessageUtils {
  * @returns {JSX.Element} The default view for moderated messages.
  */
 
-  getModeratedMessageBottomView(): JSX.Element {
-    return <CometChatModerationView/>
+  getModeratedMessageBottomView(message?: CometChat.BaseMessage): JSX.Element {
+    return <CometChatModerationView message={message}/>
   }
 
   /**

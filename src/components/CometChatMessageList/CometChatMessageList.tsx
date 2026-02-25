@@ -1872,7 +1872,7 @@ const CometChatMessageList = (props: MessageListProps) => {
             item?.getCategory() + "_" + item?.getType()
           ]?.bottomView(item, _alignment);
         } else if (getIsMessageModerated(item) && !hideModerationView) {
-          return new MessageUtils().getModeratedMessageBottomView();
+          return new MessageUtils().getModeratedMessageBottomView(item);
         }
         return null;
       } catch (error: any) {
