@@ -102,7 +102,6 @@
   color: var(--cometchat-text-color-primary, #141414);
   font: var(--cometchat-font-body-regular);
   font-style: normal;
-  outline: none;
   /* border: none; */
 }
 
@@ -151,7 +150,6 @@
   flex: 1 0 0;
   font: var(--cometchat-font-body-regular);
   font-style: normal;
-  outline: none;
 }
 
 .cometchat-create-poll__body-options-add-button {

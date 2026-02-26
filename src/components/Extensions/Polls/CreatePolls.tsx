@@ -301,6 +301,8 @@ useEffect(()=> {
               placeholder={questionPlaceholderText}
               value={inputQuestion}
               onChange={(e) => setInputQuestion(e.target.value)}
+              aria-required="true"
+              aria-describedby={isErrorOrWarning ? "cometchat-create-poll-error" : undefined}
             />
           </div>
 
@@ -316,6 +318,8 @@ useEffect(()=> {
                     type="text"
                     placeholder={answerPlaceholderText}
                     aria-label={`${answerPlaceholderText} ${i + 1}`}
+                    aria-required={i < 2 ? "true" : undefined}
+                    aria-describedby={isErrorOrWarning ? "cometchat-create-poll-error" : undefined}
                     value={option.value}
                     onChange={(e) =>
                       setInputOptionItems((prevItems) =>
@@ -344,10 +348,11 @@ useEffect(()=> {
             {inputOptionItems.length < 12 && (
               <button
                 className="cometchat-create-poll__body-options-add-button"
+                type="button"
                 onClick={addPollOption}>+ {addAnswerText}
               </button>
             )}
-            {isErrorOrWarning && <div className='cometchat-create-poll__error' role='alert'>
+            {isErrorOrWarning && <div className='cometchat-create-poll__error' role='alert' id='cometchat-create-poll-error'>
               <div className='cometchat-create-poll__error-icon' aria-hidden='true'></div>
               <div className='cometchat-create-poll__error-text'>
               {errorText}
