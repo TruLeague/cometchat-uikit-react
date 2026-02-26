@@ -1201,7 +1201,15 @@ getMessageSentAtDateFormat(messageSentAtDateTimeFormat?:CalendarObject) {
     text?: string,
     alignment?: MessageBubbleAlignment
   ) {
-    return <CometChatDeleteBubble isSentByMe={alignment == MessageBubbleAlignment.right} text={text} />;
+    let displayText = text;
+    if (!displayText) {
+      const deletedBy = message?.getDeletedBy?.();
+      const loggedInUid = CometChatUIKitLoginListener.getLoggedInUser()?.getUid();
+      if (deletedBy && loggedInUid && deletedBy === loggedInUid) {
+        displayText = "You deleted this message.";
+      }
+    }
+    return <CometChatDeleteBubble isSentByMe={alignment == MessageBubbleAlignment.right} text={displayText} />;
   }
 
   getGroupActionBubble(
