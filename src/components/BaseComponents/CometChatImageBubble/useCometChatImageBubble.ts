@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { convertHeicBlobToObjectUrl, isHeicFile } from "../../../utils/heicSupport";
 
 export const useCometChatImageBubble = ({
     src = "",
@@ -47,15 +48,18 @@ export const useCometChatImageBubble = ({
     */
     const updateImage: () => void = () => {
         downloadImage(src)
-            .then((response) => {
-                let img = new Image();
-                img.src = src;
-                img.onload = () => {
-                    setImage(img.src);
-                };
+            .then(async (response) => {
+                if (isHeicFile(src)) {
+                    const converted = await convertHeicBlobToObjectUrl(response as Blob, src);
+                    // Keep placeholder if conversion failed — browsers cannot render raw HEIC.
+                    setImage(converted ?? placeholderImage);
+                } else {
+                    setImage(src);
+                }
             })
             .catch((error) => {
-                if (src) {
+                // For HEIC, never fall back to the raw URL — it will show a broken image.
+                if (src && !isHeicFile(src)) {
                     setImage(src);
                 }
                 else {
