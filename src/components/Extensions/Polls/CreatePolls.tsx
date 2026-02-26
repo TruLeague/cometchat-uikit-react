@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CometChat } from '@cometchat/chat-sdk-javascript';
 import { PollsConstants } from './PollsConstants';
 import {getLocalizedString} from '../../../resources/CometChatLocalize/cometchat-localize';
@@ -106,6 +106,7 @@ const CreatePoll: React.FC<CreatePollProps> = ({
   const [errorText, setErrorText] = useState("")
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatePollEnabled, setIsCreatePollEnabled] = useState(false);
+  const optionsContainerRef = useRef<HTMLDivElement>(null);
 
   const [type, setType] = useState<string>('');
 
@@ -148,6 +149,15 @@ useEffect(()=> {
    */
   const addPollOption = () => {
     setInputOptionItems((prevItems) => [...prevItems, { key: '', value: '' }]);
+    // After state update, scroll to bottom and focus the new input
+    requestAnimationFrame(() => {
+      const container = optionsContainerRef.current;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+        const inputs = container.querySelectorAll<HTMLInputElement>('.cometchat-create-poll__body-option-input');
+        inputs[inputs.length - 1]?.focus();
+      }
+    });
   };
 
   /**
@@ -244,7 +254,7 @@ useEffect(()=> {
             <div className="cometchat-create-poll__body-options-title">
               {answerHelpText}
             </div>
-            <div className="cometchat-create-poll__body-options">
+            <div className="cometchat-create-poll__body-options" ref={optionsContainerRef}>
               {inputOptionItems.map((option, i) => (
                 <div key={i} className="cometchat-create-poll__body-option">
                   <input
@@ -268,15 +278,16 @@ useEffect(()=> {
                 </div>
               ))}
             </div>
-            <button
-            className={`cometchat-create-poll__body-options-add-button ${ (inputOptionItems.length >= 12) ? "cometchat-create-poll__body-options-add-button-disabled": ""}`}
-           disabled={(inputOptionItems.length >= 12)}
-           onClick={addPollOption}>+ {addAnswerText}
-          </button>
           </div>
         
         </div>
         <div className='cometchat-create-poll__footer'>
+            {inputOptionItems.length < 12 && (
+              <button
+                className="cometchat-create-poll__body-options-add-button"
+                onClick={addPollOption}>+ {addAnswerText}
+              </button>
+            )}
             {isErrorOrWarning && <div className='cometchat-create-poll__error'>
               <div className='cometchat-create-poll__error-icon'></div>
               <div className='cometchat-create-poll__error-text'>

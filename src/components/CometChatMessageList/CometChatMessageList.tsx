@@ -2973,9 +2973,16 @@ const CometChatMessageList = (props: MessageListProps) => {
     (message: CometChat.BaseMessage) => {
       try {
         if (isPartOfCurrentChatForSDKEvent(message)) {
+          // If the message was sent by the logged-in user (e.g. poll created
+          // via REST extension), treat it like an outgoing message and always
+          // scroll to the bottom so the sender sees their own message.
+          const isSentByMe = !message.getSender() || message.getSender()?.getUid() === loggedInUserRef.current?.getUid();
           playAudio();
           addMessage(message);
-          if (scrollToBottomOnNewMessages) {
+          if (isSentByMe) {
+            checkAndScrollToBottom(true);
+            checkAndMarkMessageAsRead(message);
+          } else if (scrollToBottomOnNewMessages) {
             checkAndScrollToBottom();
             checkAndMarkMessageAsRead(message);
           } else {

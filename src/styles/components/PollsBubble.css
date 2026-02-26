@@ -5,8 +5,8 @@
   padding: var(--cometchat-padding-2, 8px);
   border-radius: var(--cometchat-radius-3, 12px);
   gap: var(--cometchat-padding-4, 16px);
-  width: 240px;
-  max-width: 240px;
+  min-width: 240px;
+  max-width: 715px;
 }
 .cometchat-polls-bubble  * {
   box-sizing: border-box;
@@ -89,6 +89,7 @@
   gap: var(--cometchat-padding-2, 8px);
   width: 100%;
   position: relative;
+  cursor: pointer;
 }
 
 
@@ -157,7 +158,9 @@
 .cometchat-poll-bubble__option-item-body-content {
   display: flex;
   justify-content: space-between;
+  align-items: start;
   width: 100%;
+  gap: var(--cometchat-padding-1, 4px);
 }
 
 .cometchat-poll-bubble__option-item-body-content-title {
@@ -165,7 +168,8 @@
   font-style: normal;
   text-align: left;
   word-wrap: break-word;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
 }
 
@@ -180,10 +184,12 @@
 .cometchat-poll-bubble__option-item-body-content-tail {
   display: flex;
   justify-content: flex-end;
-  max-width: 100px;
+  align-items: center;
+  width: 64px;
+  max-width: 64px;
   position: relative;
   height: 20px;
-  width: fit-content;
+  flex-shrink: 0;
   gap: var(--cometchat-padding-1);
 }
 
