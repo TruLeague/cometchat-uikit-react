@@ -51,12 +51,14 @@
 .cometchat-create-poll__body {
   padding: var(--cometchat-padding-4, 16px);
   width: 100%;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   margin: 0;
   overflow: hidden;
+  padding-bottom: 0;
 }
 
 .cometchat-create-poll__body-question {
@@ -103,7 +105,8 @@
   gap: var(--cometchat-padding-2, 8px);
   margin-bottom: var(--cometchat-padding-2, 8px);
   overflow: hidden;
-  max-height: 64%;
+  flex: 1;
+  min-height: 0;
 }
 
 .cometchat-create-poll__body-options-title {
@@ -121,7 +124,6 @@
   gap: var(--cometchat-padding-2, 8px);
   scrollbar-width: none;
   overflow-y: scroll;
-  padding-bottom: 32px;
 }
 
 .cometchat-create-poll__body-option-input {
@@ -230,8 +232,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  position: absolute;
-  bottom: 0px;
+  flex-shrink: 0;
   border-top: 1px solid var(--cometchat-border-color-light, #F5F5F5);
   padding: var(--cometchat-padding-3, 12px) var(--cometchat-padding-4, 16px) var(--cometchat-padding-5) var(--cometchat-padding-4, 16px);
   width: 100%;
