@@ -107,6 +107,7 @@ const CreatePoll: React.FC<CreatePollProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatePollEnabled, setIsCreatePollEnabled] = useState(false);
   const optionsContainerRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   const [type, setType] = useState<string>('');
 
@@ -224,26 +225,77 @@ useEffect(()=> {
     return true;
   };
 
+  // Focus the first focusable element when the dialog mounts
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      const dialog = dialogRef.current;
+      if (dialog) {
+        const first = dialog.querySelector<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        first?.focus();
+      }
+    });
+  }, []);
+
+  // Focus trap handler for the dialog
+  const handleDialogKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Escape') {
+      ccCloseClicked?.();
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const focusable = dialog.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  };
+
   return (
     <div className="cometchat" style={{width:"fit-content",height:"fit-content"}}>
-      <div className="cometchat-create-poll">
+      <div
+        className="cometchat-create-poll"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cometchat-create-poll-title"
+        ref={dialogRef}
+        onKeyDown={handleDialogKeyDown}
+      >
         <div className="cometchat-create-poll__header">
-          <div className="cometchat-create-poll__header-title">
+          <div className="cometchat-create-poll__header-title" id="cometchat-create-poll-title">
             {title}
           </div>
           <button
-            className="cometchat-create-poll__header-close-icon"
+            className="cometchat-create-poll__header-close-icon-wrapper"
             onClick={() => ccCloseClicked && ccCloseClicked()}
             aria-label="Close poll creation"
             type="button"
-          />
+          >
+            <span className="cometchat-create-poll__header-close-icon" aria-hidden="true" />
+          </button>
         </div>
         <div className="cometchat-create-poll__body">
           <div className="cometchat-create-poll__body-question">
-            <div className="cometchat-create-poll__body-question-title">
+            <label className="cometchat-create-poll__body-question-title" htmlFor="cometchat-create-poll-question">
               {getLocalizedString("polls_question")}
-            </div>
+            </label>
             <input
+              id="cometchat-create-poll-question"
               className="cometchat-create-poll__body-question-input"
               type="text"
               placeholder={questionPlaceholderText}
@@ -253,16 +305,17 @@ useEffect(()=> {
           </div>
 
           <div className="cometchat-create-poll__body-options-wrapper">
-            <div className="cometchat-create-poll__body-options-title">
+            <div className="cometchat-create-poll__body-options-title" id="cometchat-create-poll-options-label">
               {answerHelpText}
             </div>
-            <div className="cometchat-create-poll__body-options" ref={optionsContainerRef}>
+            <div className="cometchat-create-poll__body-options" ref={optionsContainerRef} role="group" aria-labelledby="cometchat-create-poll-options-label">
               {inputOptionItems.map((option, i) => (
                 <div key={i} className="cometchat-create-poll__body-option">
                   <input
                     className="cometchat-create-poll__body-option-input"
                     type="text"
                     placeholder={answerPlaceholderText}
+                    aria-label={`${answerPlaceholderText} ${i + 1}`}
                     value={option.value}
                     onChange={(e) =>
                       setInputOptionItems((prevItems) =>
@@ -273,11 +326,13 @@ useEffect(()=> {
                   />
                   {i > 1 &&
                     <button
-                      className="cometchat-create-poll__body-option-remove-button"
+                      className="cometchat-create-poll__body-option-remove-wrapper"
                       onClick={() => removePollOption(i)}
                       aria-label={`Remove option ${i + 1}`}
                       type="button"
-                    />
+                    >
+                      <span className="cometchat-create-poll__body-option-remove-button" aria-hidden="true" />
+                    </button>
                   }
                 </div>
               ))}
@@ -292,8 +347,8 @@ useEffect(()=> {
                 onClick={addPollOption}>+ {addAnswerText}
               </button>
             )}
-            {isErrorOrWarning && <div className='cometchat-create-poll__error'>
-              <div className='cometchat-create-poll__error-icon'></div>
+            {isErrorOrWarning && <div className='cometchat-create-poll__error' role='alert'>
+              <div className='cometchat-create-poll__error-icon' aria-hidden='true'></div>
               <div className='cometchat-create-poll__error-text'>
               {errorText}
               </div>

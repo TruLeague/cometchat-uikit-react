@@ -32,6 +32,17 @@
   line-height: 120%;
 }
 
+.cometchat-create-poll__header-close-icon-wrapper {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .cometchat-create-poll__header-close-icon {
   display: flex;
   width: 24px;
@@ -44,8 +55,6 @@
   mask-size: 100%;
   -webkit-mask: url("../../assets/close.svg") center center no-repeat;
   mask: url("../../assets/close.svg") center center no-repeat;
-  border: none;
-  cursor: pointer;
 }
 
 .cometchat-create-poll__body {
@@ -159,6 +168,18 @@
   padding-bottom: var(--cometchat-padding-2);
 }
 
+.cometchat-create-poll__body-option-remove-wrapper {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+}
+
 .cometchat-create-poll__body-option-remove-button {
   -webkit-mask: url("../../assets/close.svg") center center no-repeat;
   mask: url("../../assets/close.svg") center center no-repeat;
@@ -170,9 +191,6 @@
   background-color: var(--cometchat-icon-color-secondary, #A1A1A1);
   -webkit-mask-size: contain;
   mask-size: contain;
-  border: none;
-  align-self: center;
-  cursor: pointer;
 }
 
 .cometchat-create-poll__button {
@@ -293,4 +311,18 @@
  .cometchat-create-poll{
   width: 360px;
  }
+}
+
+/* Focus styles for keyboard navigation */
+.cometchat-create-poll__header-close-icon-wrapper:focus,
+.cometchat-create-poll__body-option-remove-wrapper:focus,
+.cometchat-create-poll__body-options-add-button:focus {
+  outline: none;
+}
+
+.cometchat-create-poll__header-close-icon-wrapper:focus-visible,
+.cometchat-create-poll__body-option-remove-wrapper:focus-visible,
+.cometchat-create-poll__body-options-add-button:focus-visible {
+  outline: 1px solid #000;
+  outline-offset: -2px;
 }
