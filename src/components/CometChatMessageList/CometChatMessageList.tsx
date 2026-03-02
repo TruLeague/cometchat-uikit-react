@@ -1912,7 +1912,11 @@ const CometChatMessageList = (props: MessageListProps) => {
     let isModerated = false;
 
     if(message instanceof CometChat.MediaMessage || message instanceof CometChat.TextMessage){
-      isModerated = message.getModerationStatus() === CometChatUIKitConstants.moderationStatus.disapproved && loggedInUserRef.current?.getUid() === message.getSender()?.getUid();
+      const isDisapproved = message.getModerationStatus() === CometChatUIKitConstants.moderationStatus.disapproved;
+      const isSentByMe = loggedInUserRef.current?.getUid() === message.getSender()?.getUid();
+      const metadata = (message as any).getMetadata?.() ?? {};
+      const isConfirmedProfanity = metadata.profanity === true;
+      isModerated = isDisapproved && isSentByMe && isConfirmedProfanity;
     }
     return isModerated;
   }
