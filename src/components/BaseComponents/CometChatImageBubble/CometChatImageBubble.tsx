@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import placeholderIcon from "../../../assets/image_placeholder.png"
+import { isHeicFile } from "../../../utils/heicSupport";
 import { useCometChatImageBubble } from "./useCometChatImageBubble";
 
 interface ImageBubbleProps {
@@ -28,13 +29,18 @@ const CometChatImageBubble = (props: ImageBubbleProps) => {
         disableLoadingState = false
     } = props;
 
+    // For HEIC sources, always go through the conversion hook — browsers cannot render raw HEIC.
+    const needsConversion = isHeicFile(src);
     const { image, updateImage } = useCometChatImageBubble({ src, placeholderImage });
 
     useEffect(() => {
-        if (!disableLoadingState) {
+        if (!disableLoadingState || needsConversion) {
             updateImage();
         }
-    }, [disableLoadingState]);
+    }, [disableLoadingState, needsConversion]);
+
+    // Use the hook's converted image for HEIC even when disableLoadingState is true.
+    const displaySrc = (disableLoadingState && !needsConversion) ? src : image;
 
     const getImageBubbleView = () => {
         return (
@@ -46,7 +52,12 @@ const CometChatImageBubble = (props: ImageBubbleProps) => {
                 tabIndex={0}
                 aria-label="View image in full screen"
             >
-                <img className="cometchat-image-bubble__body" src={disableLoadingState ? src : image} alt="Image message" />
+                <img
+                    className="cometchat-image-bubble__body"
+                    src={displaySrc}
+                    alt="Image message"
+                    onError={(e) => { (e.target as HTMLImageElement).src = placeholderImage; }}
+                />
             </div >
         )
     }
