@@ -513,7 +513,11 @@ async function processFile(file: File): Promise<File> {
     // Convert HEIC/HEIF → JPEG so the image is viewable on all browsers.
     // This mirrors how WhatsApp handles iPhone photos on the sender side.
     if (isHeicFile(fileToProcess)) {
-      fileToProcess = await convertHeicFileToJpeg(fileToProcess);
+      try {
+        fileToProcess = await convertHeicFileToJpeg(fileToProcess);
+      } catch (err) {
+        console.warn("[processFile] HEIC→JPEG conversion failed, sending original:", err);
+      }
     }
     
     return new Promise((resolve, reject) => {
@@ -1537,8 +1541,9 @@ try {
         try {
           const converted = await convertHeicFileToJpeg(file);
           objectUrl = URL.createObjectURL(converted);
-        } catch {
-          // conversion failed – no image preview, fall back to file-style preview
+        } catch (err) {
+          console.warn("[CometChatMessageComposer] HEIC preview conversion failed:", err);
+          // objectUrl stays undefined – UI will show a file-style preview instead of broken image
         }
       } else if (file.type?.startsWith("image/") || file.type?.startsWith("video/")) {
         objectUrl = URL.createObjectURL(file);
