@@ -361,8 +361,8 @@ export const CometChatMessageHeader = (props: MessageHeaderProps) => {
     /* The purpose of this function is to update the subtitle text with the user status and last activity. */
     const updateLastActiveInfo = (user: CometChat.User) => {
         try {
-            if (user.getStatus() === CometChatUIKitConstants.userStatusType.online) {
-                setSubtitleText(getLocalizedString(`message_header_status_${user.getStatus().toLowerCase()}`));
+            if (MessageUtils.isUserOnline(user)) {
+                setSubtitleText(getLocalizedString(`message_header_status_${CometChatUIKitConstants.userStatusType.online.toLowerCase()}`));
             } else {
                 if (user.getLastActiveAt()) {
                     const date = user.getLastActiveAt().toString().length === 10 ? user.getLastActiveAt() :   Math.floor(user.getLastActiveAt() / 1000);
