@@ -414,6 +414,7 @@ interface MessageListProps {
 
   panelType? : string;
   primaryColor?: string;
+  messageInformationView?: (message: CometChat.BaseMessage, onClose: () => void) => JSX.Element | null;
 }
 
 const defaultProps: MessageListProps = {
@@ -520,7 +521,8 @@ const CometChatMessageList = (props: MessageListProps) => {
     showScrollbar,
     isAgentChat,
     panelType,
-    primaryColor
+    primaryColor,
+    messageInformationView
   } = { ...defaultProps, ...props };
   /**
    * All the useState useCometChatMessageList are declaired here. These trigger a rerender when updated.
@@ -4832,16 +4834,18 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
             }
           }}
         >
-          <CometChatMessageInformation
-            message={activeMessageInfo}
-            onClose={hideMessageInformation}
-            messageInfoDateTimeFormat={messageInfoDateTimeFormat}
-            messageSentAtDateTimeFormat={messageSentAtDateTimeFormat}
-            template={getMessageTemplate(activeMessageInfo)}
-            hideReceipts={hideReceipts}
-            textFormatters={textFormatters}
-            showScrollbar={showScrollbar}
-          />
+          {messageInformationView?.(activeMessageInfo, hideMessageInformation) ?? (
+            <CometChatMessageInformation
+              message={activeMessageInfo}
+              onClose={hideMessageInformation}
+              messageInfoDateTimeFormat={messageInfoDateTimeFormat}
+              messageSentAtDateTimeFormat={messageSentAtDateTimeFormat}
+              template={getMessageTemplate(activeMessageInfo)}
+              hideReceipts={hideReceipts}
+              textFormatters={textFormatters}
+              showScrollbar={showScrollbar}
+            />
+          )}
         </div>
       )}
     </>
