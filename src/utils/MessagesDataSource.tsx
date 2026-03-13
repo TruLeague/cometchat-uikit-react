@@ -384,7 +384,7 @@ getMessageSentAtDateFormat(messageSentAtDateTimeFormat?:CalendarObject) {
         <div
           className="cometchat-message-bubble__status-info-view"
         >
-          {!_messageObject.getDeletedAt() && _messageObject.getType() == CometChatUIKitConstants.MessageTypes.text && _messageObject.getEditedAt() ? <span className="cometchat-message-bubble__status-info-view-helper-text">  {getLocalizedString("message_list_action_edited")} </span> : null}
+          {!_messageObject.getDeletedAt() && _messageObject.getType() == CometChatUIKitConstants.MessageTypes.text && _messageObject.getEditedAt() && !(_messageObject as any).getMetadata?.()?.profanity ? <span className="cometchat-message-bubble__status-info-view-helper-text">  {getLocalizedString("message_list_action_edited")} </span> : null}
 
           {this.getBubbleStatusInfoDate(_messageObject, messageSentAtDateTimeFormat)}
           {!hideReceipts && this.getBubbleStatusInfoReceipt(_messageObject, hideReceipts,showError)}
