@@ -1757,7 +1757,7 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
 
         if (conversationType === CometChatUIKitConstants.MessageReceiverType.user) {
           const user = (conversation.getConversationWith() as CometChat.User);
-          status = user.getStatus();
+          status = MessageUtils.isUserOnline(user) ? CometChatUIKitConstants.userStatusType.online : CometChatUIKitConstants.userStatusType.offline;
           userBlockedFlag = new MessageUtils().getUserStatusVisible(user) || hideUserStatus;
         }
 
