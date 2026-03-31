@@ -19,7 +19,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup -c --bundleConfigAsCjs",
-    "postbuild": "xcopy /E /Y /I dist \"..\\embed-cometchat\\node_modules\\@cometchat\\chat-uikit-react\\dist\"",
     "prepare": "npm run build"
   },
   "devDependencies": {
