@@ -117,7 +117,7 @@ text-align: left;
     padding: var(--cometchat-padding-1, 4px) var(--cometchat-padding-1, 4px) 0px var(--cometchat-padding-1, 4px);
     flex-direction: column;
     align-items: flex-end;
-    border-radius: var(--cometchat-radius-3, 12px);
+    border-radius: var(--cometchat-radius-5, 20px);
 }
 
 /* Wrapper around the body of the message bubble */

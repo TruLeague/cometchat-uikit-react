@@ -1784,7 +1784,7 @@ export function CometChatConversations(props: ConversationsProps) {
           conversationType === CometChatUIKitConstants.MessageReceiverType.user
         ) {
           let user = conversation.getConversationWith() as CometChat.User;
-          status = user.getStatus();
+          status = MessageUtils.isUserOnline(user) ? CometChatUIKitConstants.userStatusType.online : CometChatUIKitConstants.userStatusType.offline;
           userBlockedFlag =
             new MessageUtils().getUserStatusVisible(user) || hideUserStatus;
         }

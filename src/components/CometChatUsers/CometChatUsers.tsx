@@ -560,7 +560,7 @@ export function CometChatUsers(props: UsersProps) {
     }
     return function (user: CometChat.User): JSX.Element {
       try {
-        const status = user.getStatus();
+        const status = MessageUtils.isUserOnline(user) ? CometChatUIKitConstants.userStatusType.online : CometChatUIKitConstants.userStatusType.offline;
         const isActive = activeUser?.getUid() === user.getUid();
         let userBlockedFlag = new MessageUtils().getUserStatusVisible(user) || hideUserStatus;        
         return (

@@ -1,6 +1,6 @@
 .cometchat-action-bubble {
     display: flex;
-    padding: var(--cometchat-padding-1, 4px) var(--cometchat-padding-3, 12px);
+    padding: 3px 6px;
     justify-content: center;
     align-items: center;
     border-radius: var(--cometchat-radius-max, 1000px);

@@ -95,8 +95,8 @@ export class MessageUtils {
  * @returns {JSX.Element} The default view for moderated messages.
  */
 
-  getModeratedMessageBottomView(): JSX.Element {
-    return <CometChatModerationView/>
+  getModeratedMessageBottomView(message?: CometChat.BaseMessage): JSX.Element {
+    return <CometChatModerationView message={message}/>
   }
 
   /**
@@ -166,6 +166,29 @@ export class MessageUtils {
       }
     }
     return userBlockedFlag;
+  }
+
+  /**
+   * Checks if a user is truly online by verifying both their status and lastActiveAt.
+   * If the status is "online"/"available" but lastActiveAt is more than 2 hours ago, returns false.
+   */
+  static isUserOnline(user: CometChat.User | CometChat.GroupMember | any): boolean {
+    if (!user || typeof user.getStatus !== 'function') {
+      return false;
+    }
+    const status = user.getStatus();
+    if (status !== CometChatUIKitConstants.userStatusType.online) {
+      return false;
+    }
+    if (typeof user.getLastActiveAt === 'function' && user.getLastActiveAt()) {
+      const lastActive = user.getLastActiveAt();
+      const lastActiveEpoch = lastActive.toString().length === 10 ? lastActive : Math.floor(lastActive / 1000);
+      const twoHoursAgo = Math.floor(Date.now() / 1000) - (2 * 60 * 60);
+      if (lastActiveEpoch < twoHoursAgo) {
+        return false;
+      }
+    }
+    return true;
   }
   /**
    * Description placeholder
