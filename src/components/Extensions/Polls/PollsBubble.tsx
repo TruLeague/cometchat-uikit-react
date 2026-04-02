@@ -99,7 +99,12 @@ const PollsBubble = (props: PollsBubbleProps) => {
         const vote = optionData?.count || 0;
         const calculatedPercent = totalVotes > 0 ? Math.round((vote / totalVotes) * 100) : 0;
         const selectedByLoggedInUser = optionData?.voters?.hasOwnProperty(loggedInUser?.getUid()) || false;
-        const votersObj = pollsData?.results.options[Number(currentItem)].voters ? Object.values(pollsData?.results.options[Number(currentItem)].voters).slice(0, 3).map((v: any) => v) : [];
+        const votersObj = pollsData?.results.options[Number(currentItem)].voters ? Object.entries(pollsData?.results.options[Number(currentItem)].voters).slice(0, 3).map(([uid, v]: [string, any]) => {
+          const u = new CometChat.User(uid);
+          if (v?.name) u.setName(v.name);
+          if (v?.avatar) u.setAvatar(v.avatar);
+          return u;
+        }) : [];
         return {
           id: currentItem,
           percent: `${calculatedPercent}%`,
@@ -174,7 +179,8 @@ const PollsBubble = (props: PollsBubbleProps) => {
                         option?.votersObj && option?.votersObj.map(
                           (user: any, index: number) => {
 
-                            const { name, avatar } = user;
+                            const name = typeof user.getName === 'function' ? user.getName() : user.name;
+                            const avatar = typeof user.getAvatar === 'function' ? user.getAvatar() : user.avatar;
                             let isLastIndex = index == option?.votersObj!.length - 1
 
                             return (

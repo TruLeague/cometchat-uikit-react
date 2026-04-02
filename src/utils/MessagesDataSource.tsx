@@ -980,7 +980,8 @@ getMessageSentAtDateFormat(messageSentAtDateTimeFormat?:CalendarObject) {
     if (!messageObject?.getParentMessageId() && !additionalParams?.hideReplyInThreadOption) {
       messageOptionList.push(this.getReplyInThreadOption());
     }
-    if (isSentByMe && !additionalParams?.hideMessageInfoOption) {
+    const isPollMessage = messageObject?.getType?.() === PollsConstants.extension_poll;
+    if ((isSentByMe || isPollMessage) && !additionalParams?.hideMessageInfoOption) {
       messageOptionList.push(this.getMessageInfoOption());
     }
     if ((isSentByMe || (!isParticipant && group)) && !additionalParams?.hideDeleteMessageOption)
