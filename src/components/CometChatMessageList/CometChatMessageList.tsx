@@ -51,6 +51,7 @@ import { MessageUtils } from "../../utils/MessageUtils";
 import { PanelTypeContext } from "../../context/PanelTypeContext";
 import { startStreamingMessage, streamingState$ } from "../../services/stream-message.service";
 import { sendMessageToMobileApp } from "../../utils/MobileBridge";
+import { resolveDisplayName } from "../../utils/nameTransformer";
 
 
 /**
@@ -1182,7 +1183,7 @@ const CometChatMessageList = (props: MessageListProps) => {
           }
         }
         if (user) {
-          messageTextTmp = messageTextTmp.replace(match[0], "@" + user?.getName());
+          messageTextTmp = messageTextTmp.replace(match[0], "@" + resolveDisplayName(user?.getName(), user));
         }
         match = regex.exec(messageText);
       }
@@ -4068,8 +4069,10 @@ const CometChatMessageList = (props: MessageListProps) => {
 
   const getBubbleHeaderTitle: (item: CometChat.BaseMessage) => JSX.Element = useCallback(
     (item: CometChat.BaseMessage) => {
+      const sender = item?.getSender() || loggedInUserRef.current;
+      const rawName = sender?.getName() || "";
       return (
-        <>{item?.getSender()?.getName() || loggedInUserRef.current?.getName()}</>
+        <>{resolveDisplayName(rawName, sender)}</>
       );
     },
     []

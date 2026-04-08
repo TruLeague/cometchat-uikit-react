@@ -43,6 +43,7 @@ import { decodeHTML, getThemeVariable, isMobileDevice, isSafari, isSvgFile, proc
 import { convertHeicFileToJpeg, isHeicFile } from '../../utils/heicSupport';
 import { CometChatMessageEvents } from '../../events/CometChatMessageEvents';
 import { CometChatUIEvents } from '../../events/CometChatUIEvents';
+import { resolveDisplayName } from '../../utils/nameTransformer';
 import { CometChatSoundManager } from "../../resources/CometChatSoundManager/CometChatSoundManager";
 import { useCometChatFrameContext } from "../../context/CometChatFrameContext";
 import { CometChatMessagePreview } from "../BaseComponents/CometChatMessagePreview/CometChatMessagePreview";
@@ -2642,7 +2643,7 @@ try {
         if (user) {
           messageTextTmp = messageTextTmp.replace(
             match[0],
-            "@" + user.getName()
+            "@" + resolveDisplayName(user.getName(), user)
           );
           cometChatUsersGroupMembers.push(user);
         }

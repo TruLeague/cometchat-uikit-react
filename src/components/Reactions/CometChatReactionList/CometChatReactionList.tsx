@@ -9,6 +9,7 @@ import { useCometChatErrorHandler } from "../../../CometChatCustomHooks";
 import { Subscription } from "rxjs";
 import { CometChatMessageEvents } from "../../../events/CometChatMessageEvents";
 import { JSX } from 'react';
+import { resolveDisplayName } from "../../../utils/nameTransformer";
 interface ReactionListProps {
     /* Base message object of which reaction info is viewed. */
     messageObject: CometChat.BaseMessage;
@@ -389,7 +390,7 @@ export const CometChatReactionList: React.FC<ReactionListProps> = ({
                                 return (
                                     <div className="cometchat-reaction-list__list-item" key={reaction?.getReactionId()}>
                                         <CometChatListItem
-                                            title={isMe ? youText : reaction?.getReactedBy()?.getName()}
+                                            title={isMe ? youText : resolveDisplayName(reaction?.getReactedBy()?.getName() || "", reaction?.getReactedBy())}
                                             subtitleView={isMe ? <div>
                                                 {subtitleText}
                                             </div> : null}
@@ -397,7 +398,7 @@ export const CometChatReactionList: React.FC<ReactionListProps> = ({
                                                 {reaction?.getReaction()}
                                             </div>}
                                             avatarURL={reaction?.getReactedBy()?.getAvatar()}
-                                            avatarName={reaction?.getReactedBy()?.getName()}
+                                            avatarName={resolveDisplayName(reaction?.getReactedBy()?.getName() || "", reaction?.getReactedBy())}
                                             onListItemClicked={() => {
                                                 if (isMyReaction(reaction)) {
                                                     updateMessageToRemoveReactionLocally(reaction);

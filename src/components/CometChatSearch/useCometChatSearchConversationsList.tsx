@@ -18,6 +18,7 @@ import { CollaborativeDocumentConstants } from "../Extensions/CollaborativeDocum
 import { CometChatContextMenu } from "../BaseComponents/CometChatContextMenu/CometChatContextMenu";
 import { getThemeMode, isURL, sanitizeCalendarObject, encryptName } from "../../utils/util";
 import { ChatConfigurator } from "../../utils/ChatConfigurator";
+import { resolveDisplayName } from "../../utils/nameTransformer";
 import { CometChatButton } from "../BaseComponents/CometChatButton/CometChatButton";
 import { CometChatCallEvents } from "../../events/CometChatCallEvents";
 import { CometChatMessageEvents } from "../../events/CometChatMessageEvents";
@@ -1770,8 +1771,8 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
             <CometChatListItem
               id={conversation.getConversationId()}
               avatarURL={getListItemAvatarURL(conversation)}
-              avatarName={conversation.getConversationWith().getName()}
-              title={conversation.getConversationWith().getName()}
+              avatarName={resolveDisplayName(conversation.getConversationWith().getName(), conversation.getConversationType() === "user" ? conversation.getConversationWith() as CometChat.User : null)}
+              title={resolveDisplayName(conversation.getConversationWith().getName(), conversation.getConversationType() === "user" ? conversation.getConversationWith() as CometChat.User : null)}
               titleView={titleView ? titleView(conversation) : undefined}
               leadingView={leadingView ? leadingView(conversation) : undefined}
               onListItemClicked={(e) => onItemClick?.(conversation,searchKeyword)}
