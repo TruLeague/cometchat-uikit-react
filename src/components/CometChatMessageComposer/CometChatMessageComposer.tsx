@@ -272,6 +272,11 @@ interface MessageComposerProps {
   auxiliaryButtonView?: JSX.Element;
 
   /**
+   * A custom view rendered before the attachment button in the composer toolbar.
+   */
+  secondaryButtonView?: JSX.Element;
+
+  /**
    * A custom header section displayed at the top of the message composer, often used for media previews or additional information.
    */
   headerView?: JSX.Element;
@@ -435,6 +440,7 @@ export function CometChatMessageComposer(props: MessageComposerProps) {
     onError,
     sendButtonView,
     auxiliaryButtonView,
+    secondaryButtonView,
     headerView = null,
     attachmentOptions,
     parentMessageId = null,
@@ -3047,7 +3053,8 @@ try {
     const isRecording = state.contentToDisplay === "voiceRecording";
     const hasAttachmentButton = !shouldShowAttachmentButton();
     const hasAuxiliaryView = !!auxiliaryButtonView;
-    const showFirstButtonsDiv = hasAttachmentButton || hasAuxiliaryView;
+    const hasSecondaryButton = !!secondaryButtonView;
+    const showFirstButtonsDiv = hasAttachmentButton || hasAuxiliaryView || hasSecondaryButton;
     
     return (
       <div className="cometchat-message-composer__input-container">
@@ -3065,6 +3072,7 @@ try {
               gap: getThemeVariable("--cometchat-padding-4"),
             }}
           >
+            {secondaryButtonView}
             {hasAttachmentButton && getActionsheetView()}
             {getAuxiliaryView()}
           </div>
