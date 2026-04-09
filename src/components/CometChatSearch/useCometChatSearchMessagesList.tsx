@@ -742,10 +742,11 @@ export function useCometChatSearchMessagesList(props: UseCometChatSearchMessages
 const getMessageTitle = useCallback((message: CometChat.BaseMessage): string => {
   let user = loggedInUser ?? CometChatUIKitLoginListener.getLoggedInUser();
  if(uid || guid){
-   return isMessageSentByMe(message, user! ) ? getLocalizedString("search_message_title_you") : message.getSender()?.getName();
+   const sender = message.getSender();
+   return isMessageSentByMe(message, user! ) ? getLocalizedString("search_message_title_you") : resolveDisplayName(sender?.getName(), sender);
  }
  let receiver = message.getReceiver();
- return receiver.getName();
+ return resolveDisplayName(receiver.getName(), receiver instanceof CometChat.User ? receiver : null);
 
 },[uid,guid,loggedInUser])
   /**

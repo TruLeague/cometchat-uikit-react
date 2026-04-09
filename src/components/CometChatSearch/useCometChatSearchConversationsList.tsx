@@ -1524,7 +1524,7 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
         if (convWith instanceof CometChat.Group) {
           return (
             <div className="cometchat-search__conversations-subtitle-typing">
-              {typingIndicator.getSender().getName()}
+              {resolveDisplayName(typingIndicator.getSender().getName(), typingIndicator.getSender())}
               {": "}
               {getLocalizedString("conversation_subtitle_typing")}
             </div>
@@ -1549,7 +1549,7 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
         const isMessageFromLoggedInUser = lastMessage?.getSender().getUid() == currentLoggedInUser.getUid();
         const getLastMessageSenderName = isMessageFromLoggedInUser
           ? getLocalizedString("conversation_subtitle_you_message")
-          : lastMessage?.getSender().getName();
+          : resolveDisplayName(lastMessage?.getSender().getName(), lastMessage?.getSender());
 
         let subtitle = ChatConfigurator.getDataSource().getLastConversationMessage(
           conversation,
