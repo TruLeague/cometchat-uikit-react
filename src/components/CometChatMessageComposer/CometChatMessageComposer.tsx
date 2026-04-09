@@ -1134,12 +1134,16 @@ try {
         if (mentionedUsers) {
           let userObj = [];
           for (let i = 0; i < mentionedUsers.length; i++) {
-            userObj.push(
-              new CometChat.User({
-                uid: mentionedUsers[i].getUid(),
-                name: mentionedUsers[i].getName(),
-              })
-            );
+            const u = new CometChat.User({
+              uid: mentionedUsers[i].getUid(),
+              name: mentionedUsers[i].getName(),
+              role: mentionedUsers[i].getRole(),
+            });
+            const meta = mentionedUsers[i].getMetadata();
+            if (meta) {
+              u.setMetadata(meta);
+            }
+            userObj.push(u);
           }
           if (messageToReplyRef.current){
             textMessage.setQuotedMessage(messageToReplyRef.current);
