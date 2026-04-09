@@ -4,6 +4,7 @@ import { PollsConstants } from './PollsConstants';
 import { CometChatAvatar } from "../../BaseComponents/CometChatAvatar/CometChatAvatar";
 import { CometChatRadioButton } from "../../BaseComponents/CometChatRadioButton/CometChatRadioButton";
 import { MessageBubbleAlignment } from "../../../Enums/Enums";
+import { resolveDisplayName } from "../../../utils/nameTransformer";
 
 export interface PollOptions {
   id: string;
@@ -179,7 +180,7 @@ const PollsBubble = (props: PollsBubbleProps) => {
                         option?.votersObj && option?.votersObj.map(
                           (user: any, index: number) => {
 
-                            const name = typeof user.getName === 'function' ? user.getName() : user.name;
+                            const name = typeof user.getName === 'function' ? resolveDisplayName(user.getName(), user) : (user.name || "");
                             const avatar = typeof user.getAvatar === 'function' ? user.getAvatar() : user.avatar;
                             let isLastIndex = index == option?.votersObj!.length - 1
 

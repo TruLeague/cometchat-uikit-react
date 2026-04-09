@@ -21,6 +21,7 @@ import { CometChatUIKitCalls } from "./CometChatCalls";
 import { ChatSdkEventInitializer } from "../utils/ChatSdkEventInitializer";
 import { CometChatMessageEvents } from "../events/CometChatMessageEvents";
 import { MessageStatus } from "../Enums/Enums";
+import { setNameTransformerFn, resolveDisplayName } from "../utils/nameTransformer";
 
 interface CometChatUiKit {
     name: string;
@@ -69,6 +70,34 @@ class CometChatUIKit {
     */
 
     static themeMode: "light" | "dark" = "light";
+
+    /**
+     * Optional callback to transform a user's display name.
+     * When set, every UI Kit component that renders a user name will call this
+     * function instead of using the raw `getName()` value.
+     *
+     * @param name - The raw name from `getName()`
+     * @param user - The CometChat User / GroupMember object (when available)
+     * @returns The transformed display name string
+     */
+    static nameTransformer: ((name: string, user?: CometChat.User | CometChat.GroupMember | null) => string) | null = null;
+
+    /**
+     * Registers a custom name transformer that components will use to render
+     * user display names.
+     */
+    static setNameTransformer(fn: (name: string, user?: CometChat.User | CometChat.GroupMember | null) => string) {
+        CometChatUIKit.nameTransformer = fn;
+        setNameTransformerFn(fn);
+    }
+
+    /**
+     * Returns the display name for a user, running it through the registered
+     * nameTransformer if one exists.  Falls back to the raw name.
+     */
+    static getDisplayName(name: string, user?: CometChat.User | CometChat.GroupMember | null): string {
+        return resolveDisplayName(name, user);
+    }
 
     /**
      * Initializes the CometChat UI Kit with the provided settings.
