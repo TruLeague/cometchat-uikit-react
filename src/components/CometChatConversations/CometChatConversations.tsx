@@ -445,7 +445,15 @@ function stateReducer(state: State, action: Action): State {
         const newConversationList = conversationList.map((conv, i) => {
           if (i === targetIdx) {
             const newConv = CometChatUIKitUtility.clone(conv);
-            newConv.setConversationWith(user);
+            const existingUser = newConv.getConversationWith() as CometChat.User;
+            // Only update status from the presence event — preserve existing
+            // role, metadata, name, avatar etc. that may be missing from the
+            // lightweight WebSocket presence payload.
+            existingUser.setStatus(user.getStatus());
+            if (user.getLastActiveAt()) {
+              existingUser.setLastActiveAt(user.getLastActiveAt());
+            }
+            newConv.setConversationWith(existingUser);
             return newConv;
           }
           return conv;
