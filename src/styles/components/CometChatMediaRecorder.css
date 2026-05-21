@@ -302,3 +302,141 @@
     transform: rotate(180deg);
     mask-size: contain;
 }
+
+/* ===== Inline Media Recorder (single-row layout) ===== */
+
+.cometchat-media-recorder-inline {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    height: 100%;
+    gap: 12px;
+    padding: 0 12px;
+}
+
+.cometchat-media-recorder-inline__delete {
+    display: flex;
+    width: 28px;
+    height: 28px;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: var(--cometchat-radius-max, 1000px);
+    flex-shrink: 0;
+}
+
+.cometchat-media-recorder-inline__delete:hover {
+    background: var(--cometchat-background-color-02, #FAFAFA);
+}
+
+.cometchat-media-recorder-inline__delete-icon {
+    width: 20px;
+    height: 20px;
+    -webkit-mask: url("../../assets/delete_recording.svg") center center no-repeat;
+    mask: url("../../assets/delete_recording.svg") center center no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    background: var(--TL-cometchat-error-color, #DC022B);
+}
+
+.cometchat-media-recorder-inline__recording-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--TL-cometchat-error-color, #DC022B);
+    flex-shrink: 0;
+    animation: cometchat-recording-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes cometchat-recording-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.cometchat-media-recorder-inline__timer {
+    font: var(--cometchat-font-body-regular, 400 14px Roboto);
+    color: var(--cometchat-text-color-primary, #141414);
+    flex-shrink: 0;
+    min-width: 36px;
+    text-align: center;
+}
+
+.cometchat-media-recorder-inline__pause,
+.cometchat-media-recorder-inline__play,
+.cometchat-media-recorder-inline__mic {
+    display: flex;
+    width: 28px;
+    height: 28px;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: var(--cometchat-radius-max, 1000px);
+    flex-shrink: 0;
+}
+
+.cometchat-media-recorder-inline__pause:hover,
+.cometchat-media-recorder-inline__play:hover,
+.cometchat-media-recorder-inline__mic:hover {
+    background: var(--cometchat-background-color-02, #FAFAFA);
+}
+
+.cometchat-media-recorder-inline__pause-icon {
+    width: 18px;
+    height: 18px;
+    -webkit-mask: url("../../assets/pause_recording.svg") center center no-repeat;
+    mask: url("../../assets/pause_recording.svg") center center no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    background: var(--cometchat-text-color-primary, #141414);
+}
+
+.cometchat-media-recorder-inline__play-icon {
+    width: 18px;
+    height: 18px;
+    -webkit-mask: url("../../assets/play_recording.svg") center center no-repeat;
+    mask: url("../../assets/play_recording.svg") center center no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    background: var(--cometchat-text-color-primary, #141414);
+}
+
+.cometchat-media-recorder-inline__play-icon--playing {
+    -webkit-mask: url("../../assets/pause_recording.svg") center center no-repeat;
+    mask: url("../../assets/pause_recording.svg") center center no-repeat;
+}
+
+.cometchat-media-recorder-inline__mic-icon {
+    width: 20px;
+    height: 20px;
+    -webkit-mask: url("../../assets/mic_recording.svg") center center no-repeat;
+    mask: url("../../assets/mic_recording.svg") center center no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    background: var(--cometchat-text-color-primary, #141414);
+}
+
+.cometchat-media-recorder-inline__error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 0 12px;
+}
+
+.cometchat-media-recorder-inline__error-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    background: var(--TL-cometchat-error-color, #DC022B);
+    border-radius: var(--cometchat-radius-max);
+    -webkit-mask: url("../../assets/error_info.svg") center center no-repeat;
+    mask: url("../../assets/error_info.svg") center center no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+.cometchat-media-recorder-inline__error-text {
+    font: var(--cometchat-font-caption1-regular, 400 12px Roboto);
+    color: var(--TL-cometchat-error-color, #DC022B);
+}
