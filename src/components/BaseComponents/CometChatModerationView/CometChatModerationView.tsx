@@ -1,7 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { getLocalizedString } from '../../../resources/CometChatLocalize/cometchat-localize';
 
-const CometChatModerationView = () => {
+interface CometChatModerationViewProps {
+    message?: any;
+}
+
+const CometChatModerationView: React.FC<CometChatModerationViewProps> = ({ message }) => {
+    const flaggedWords: string[] = message?.getMetadata?.()?.flagged_words
+        ?? message?.metadata?.flagged_words
+        ?? [];
     const elementRef = useRef<HTMLDivElement | null>(null);
     const [width, setWidth] = useState(0);
 
@@ -33,16 +40,28 @@ const CometChatModerationView = () => {
         <div
             ref={elementRef}
             className="cometchat-moderation-status"
-            style={{
-                width: width >= 240
-                    ? `calc(${width}px + var(--cometchat-padding-1) * 2)`
-                    : "240px"
-            }}
+            // style={{
+            //     width: width >= 240
+            //         ? `calc(${width}px + var(--cometchat-padding-1) * 2)`
+            //         : "240px"
+            // }}
         >
+            <div className='cometchat-moderation-status--header-wrapper'>
             <div className="cometchat-moderation-status__icon"></div>
             <p className="cometchat-moderation-status__message">
                 {getLocalizedString("moderation_block_message")}
             </p>
+            </div>
+            {flaggedWords.length > 0 && (
+                <div className="cometchat-moderation-status__flagged-words">
+                    <span className="cometchat-moderation-status__flagged-label">Flagged word(s): </span>
+                    {flaggedWords.map((word, index) => (
+                        <span key={index} className="cometchat-moderation-status__flagged-word">
+                            {word}{index < flaggedWords.length - 1 ? ', ' : ''}
+                        </span>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

@@ -6,6 +6,7 @@ import {getLocalizedString} from "../../../resources/CometChatLocalize/cometchat
 import { CometChatUIKitConstants } from "../../../constants/CometChatUIKitConstants";
 import { useCometChatErrorHandler } from "../../../CometChatCustomHooks";
 import { useCometChatFrameContext } from "../../../context/CometChatFrameContext";
+import { resolveDisplayName } from "../../../utils/nameTransformer";
 
 interface ReactionInfoProps {
     /* Base message object of which reaction info is viewed. */
@@ -129,7 +130,7 @@ export const CometChatReactionInfo: React.FC<ReactionInfoProps> = ({
                     if (reaction?.reactedBy?.uid === loggedInUser?.getUid()) {
                         fetchedReactionNames.unshift(youText);
                     } else {
-                        fetchedReactionNames.push(reaction?.getReactedBy()?.getName());
+                        fetchedReactionNames.push(resolveDisplayName(reaction?.getReactedBy()?.getName() || "", reaction?.getReactedBy()));
                     }
                 });
                 setReactionNames(fetchedReactionNames);

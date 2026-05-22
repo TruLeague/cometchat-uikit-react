@@ -91,8 +91,8 @@ const CometChatTextBubble = (props: TextBubbleProps) => {
                         WebkitLineClamp: isExpanded ? 'unset' : 4,
                     }}>{textState}</p>
                     {isTruncated && !isExpanded && (
-                        <button
-                            type="button"
+                        <span
+                            role="button"
                             className="cometchat-text-bubble__read-more"
                             aria-label="Expand message to read more"
                             onClick={() => {
@@ -101,11 +101,11 @@ const CometChatTextBubble = (props: TextBubbleProps) => {
                             }}
                         >
                             {getLocalizedString("text_message_read_more")}
-                        </button>
+                        </span>
                     )}
                     {isExpanded && isTruncated && (
-                        <button
-                            type="button"
+                        <span
+                            role="button"
                             className="cometchat-text-bubble__read-less"
                             aria-label="Collapse message to show less"
                             onClick={() => {
@@ -114,7 +114,7 @@ const CometChatTextBubble = (props: TextBubbleProps) => {
                             }}
                         >
                             {getLocalizedString("text_message_show_less")}
-                        </button>
+                        </span>
                     )}
                 </div>
             </div>

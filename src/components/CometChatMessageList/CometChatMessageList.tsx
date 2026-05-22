@@ -51,6 +51,7 @@ import { MessageUtils } from "../../utils/MessageUtils";
 import { PanelTypeContext } from "../../context/PanelTypeContext";
 import { startStreamingMessage, streamingState$ } from "../../services/stream-message.service";
 import { sendMessageToMobileApp } from "../../utils/MobileBridge";
+import { resolveDisplayName } from "../../utils/nameTransformer";
 
 
 /**
@@ -414,6 +415,7 @@ interface MessageListProps {
 
   panelType? : string;
   primaryColor?: string;
+  messageInformationView?: (message: CometChat.BaseMessage, onClose: () => void) => JSX.Element | null;
 }
 
 const defaultProps: MessageListProps = {
@@ -520,7 +522,8 @@ const CometChatMessageList = (props: MessageListProps) => {
     showScrollbar,
     isAgentChat,
     panelType,
-    primaryColor
+    primaryColor,
+    messageInformationView
   } = { ...defaultProps, ...props };
   /**
    * All the useState useCometChatMessageList are declaired here. These trigger a rerender when updated.
@@ -1180,7 +1183,7 @@ const CometChatMessageList = (props: MessageListProps) => {
           }
         }
         if (user) {
-          messageTextTmp = messageTextTmp.replace(match[0], "@" + user?.getName());
+          messageTextTmp = messageTextTmp.replace(match[0], "@" + resolveDisplayName(user?.getName(), user));
         }
         match = regex.exec(messageText);
       }
@@ -1872,7 +1875,7 @@ const CometChatMessageList = (props: MessageListProps) => {
             item?.getCategory() + "_" + item?.getType()
           ]?.bottomView(item, _alignment);
         } else if (getIsMessageModerated(item) && !hideModerationView) {
-          return new MessageUtils().getModeratedMessageBottomView();
+          return new MessageUtils().getModeratedMessageBottomView(item);
         }
         return null;
       } catch (error: any) {
@@ -1912,7 +1915,11 @@ const CometChatMessageList = (props: MessageListProps) => {
     let isModerated = false;
 
     if(message instanceof CometChat.MediaMessage || message instanceof CometChat.TextMessage){
-      isModerated = message.getModerationStatus() === CometChatUIKitConstants.moderationStatus.disapproved && loggedInUserRef.current?.getUid() === message.getSender()?.getUid();
+      const isDisapproved = message.getModerationStatus() === CometChatUIKitConstants.moderationStatus.disapproved;
+      const isSentByMe = loggedInUserRef.current?.getUid() === message.getSender()?.getUid();
+      const metadata = (message as any).getMetadata?.() ?? {};
+      const isConfirmedProfanity = metadata.profanity === true;
+      isModerated = isDisapproved && isSentByMe && isConfirmedProfanity;
     }
     return isModerated;
   }
@@ -2974,9 +2981,16 @@ const CometChatMessageList = (props: MessageListProps) => {
     (message: CometChat.BaseMessage) => {
       try {
         if (isPartOfCurrentChatForSDKEvent(message)) {
+          // If the message was sent by the logged-in user (e.g. poll created
+          // via REST extension), treat it like an outgoing message and always
+          // scroll to the bottom so the sender sees their own message.
+          const isSentByMe = !message.getSender() || message.getSender()?.getUid() === loggedInUserRef.current?.getUid();
           playAudio();
           addMessage(message);
-          if (scrollToBottomOnNewMessages) {
+          if (isSentByMe) {
+            checkAndScrollToBottom(true);
+            checkAndMarkMessageAsRead(message);
+          } else if (scrollToBottomOnNewMessages) {
             checkAndScrollToBottom();
             checkAndMarkMessageAsRead(message);
           } else {
@@ -4055,8 +4069,10 @@ const CometChatMessageList = (props: MessageListProps) => {
 
   const getBubbleHeaderTitle: (item: CometChat.BaseMessage) => JSX.Element = useCallback(
     (item: CometChat.BaseMessage) => {
+      const sender = item?.getSender() || loggedInUserRef.current;
+      const rawName = sender?.getName() || "";
       return (
-        <>{item?.getSender()?.getName() || loggedInUserRef.current?.getName()}</>
+        <>{resolveDisplayName(rawName, sender)}</>
       );
     },
     []
@@ -4825,16 +4841,18 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
             }
           }}
         >
-          <CometChatMessageInformation
-            message={activeMessageInfo}
-            onClose={hideMessageInformation}
-            messageInfoDateTimeFormat={messageInfoDateTimeFormat}
-            messageSentAtDateTimeFormat={messageSentAtDateTimeFormat}
-            template={getMessageTemplate(activeMessageInfo)}
-            hideReceipts={hideReceipts}
-            textFormatters={textFormatters}
-            showScrollbar={showScrollbar}
-          />
+          {messageInformationView?.(activeMessageInfo, hideMessageInformation) ?? (
+            <CometChatMessageInformation
+              message={activeMessageInfo}
+              onClose={hideMessageInformation}
+              messageInfoDateTimeFormat={messageInfoDateTimeFormat}
+              messageSentAtDateTimeFormat={messageSentAtDateTimeFormat}
+              template={getMessageTemplate(activeMessageInfo)}
+              hideReceipts={hideReceipts}
+              textFormatters={textFormatters}
+              showScrollbar={showScrollbar}
+            />
+          )}
         </div>
       )}
     </>

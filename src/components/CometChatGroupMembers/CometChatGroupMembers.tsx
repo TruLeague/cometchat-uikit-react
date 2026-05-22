@@ -36,6 +36,7 @@ import errorIcon from "../../assets/list_error_state_icon.svg"
 import errorIconDark from "../../assets/list_error_state_icon_dark.svg"
 import { CometChatGroupEvents } from "../../events/CometChatGroupEvents";
 import { getThemeMode } from "../../utils/util";
+import { resolveDisplayName } from "../../utils/nameTransformer";
 
 interface GroupMembersProps {
   /**
@@ -992,11 +993,11 @@ export function CometChatGroupMembers(props: GroupMembersProps) {
       const status = groupMember.getStatus()
       const listItemProps: any = {
         id: groupMember.getUid(),
-        title: groupMember.getName(),
+        title: resolveDisplayName(groupMember.getName(), groupMember),
         leadingView: leadingView?.(groupMember),
         titleView: titleView?.(groupMember),
         avatarURL: groupMember.getAvatar(),
-        avatarName: groupMember.getName(),
+        avatarName: resolveDisplayName(groupMember.getName(), groupMember),
         subtitleView: subtitleView?.(groupMember),
         trailingView: getDefaultListItemTailView(groupMember),
         menuView: !trailingView ? getDefaultListItemMenuView(groupMember) : null,

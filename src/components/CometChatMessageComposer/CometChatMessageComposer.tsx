@@ -40,8 +40,10 @@ import { CometChatActionSheet } from "../BaseComponents/CometChatActionSheet/Com
 import { CometChatEmojiKeyboard } from "../BaseComponents/CometChatEmojiKeyboard/CometChatEmojiKeyboard";
 import { ComposerId } from '../../utils/MessagesDataSource';
 import { decodeHTML, getThemeVariable, isMobileDevice, isSafari, isSvgFile, processFileForAudio, sanitizeHtmlStringToFragment, sanitizeSvgFile } from '../../utils/util';
+import { convertHeicFileToJpeg, isHeicFile } from '../../utils/heicSupport';
 import { CometChatMessageEvents } from '../../events/CometChatMessageEvents';
 import { CometChatUIEvents } from '../../events/CometChatUIEvents';
+import { resolveDisplayName } from '../../utils/nameTransformer';
 import { CometChatSoundManager } from "../../resources/CometChatSoundManager/CometChatSoundManager";
 import { useCometChatFrameContext } from "../../context/CometChatFrameContext";
 import { CometChatMessagePreview } from "../BaseComponents/CometChatMessagePreview/CometChatMessagePreview";
@@ -507,6 +509,16 @@ async function processFile(file: File): Promise<File> {
     let fileToProcess = file;
     if (isSvgFile(file)) {
       fileToProcess = await sanitizeSvgFile(file);
+    }
+
+    // Convert HEIC/HEIF → JPEG so the image is viewable on all browsers.
+    // This mirrors how WhatsApp handles iPhone photos on the sender side.
+    if (isHeicFile(fileToProcess)) {
+      try {
+        fileToProcess = await convertHeicFileToJpeg(fileToProcess);
+      } catch (err) {
+        console.warn("[processFile] HEIC→JPEG conversion failed, sending original:", err);
+      }
     }
     
     return new Promise((resolve, reject) => {
@@ -1122,12 +1134,16 @@ try {
         if (mentionedUsers) {
           let userObj = [];
           for (let i = 0; i < mentionedUsers.length; i++) {
-            userObj.push(
-              new CometChat.User({
-                uid: mentionedUsers[i].getUid(),
-                name: mentionedUsers[i].getName(),
-              })
-            );
+            const u = new CometChat.User({
+              uid: mentionedUsers[i].getUid(),
+              name: mentionedUsers[i].getName(),
+              role: mentionedUsers[i].getRole(),
+            });
+            const meta = mentionedUsers[i].getMetadata();
+            if (meta) {
+              u.setMetadata(meta);
+            }
+            userObj.push(u);
           }
           if (messageToReplyRef.current){
             textMessage.setQuotedMessage(messageToReplyRef.current);
@@ -1508,8 +1524,14 @@ try {
       const acceptAttr = mediaFilePickerElement.accept;
       const expectedFileType =
         !acceptAttr || acceptAttr === "*/*" ? "file" : acceptAttr.split("/")[0];
+
+      // Treat HEIC/HEIF as image even when the browser reports empty MIME type
+      // (Chrome/Edge on Windows). The file will be converted to JPEG in processFile.
+      const isHeic = isHeicFile(file);
       const actualFileType =
-        expectedFileType === "file" ? "file" : file.type.split("/")[0];
+        expectedFileType === "file"
+          ? "file"
+          : (isHeic ? "image" : file.type.split("/")[0]);
 
       if (expectedFileType !== "file" && expectedFileType !== actualFileType) {
         dispatch({ type: "setShowValidationError", showValidationError: true });
@@ -1517,13 +1539,24 @@ try {
         return;
       }
 
+      // Build preview objectUrl *before* setting state.
+      // For HEIC, convert to JPEG first because browsers cannot render HEIC natively.
+      let objectUrl: string | undefined;
+      if (isHeic) {
+        try {
+          const converted = await convertHeicFileToJpeg(file);
+          objectUrl = URL.createObjectURL(converted);
+        } catch (err) {
+          console.warn("[CometChatMessageComposer] HEIC preview conversion failed:", err);
+          // objectUrl stays undefined – UI will show a file-style preview instead of broken image
+        }
+      } else if (file.type?.startsWith("image/") || file.type?.startsWith("video/")) {
+        objectUrl = URL.createObjectURL(file);
+      }
+
       setPendingAttachment((previous) => {
         if (previous?.objectUrl) {
           URL.revokeObjectURL(previous.objectUrl);
-        }
-        let objectUrl: string | undefined;
-        if (file.type?.startsWith("image/") || file.type?.startsWith("video/")) {
-          objectUrl = URL.createObjectURL(file);
         }
         return {
           file,
@@ -2314,7 +2347,7 @@ try {
       } else {
         // Open the correct file picker
         const acceptMap: Record<string, string> = {
-          [CometChatUIKitConstants.MessageTypes.image]: "image/*",
+          [CometChatUIKitConstants.MessageTypes.image]: "image/*,.heic,.heif",
           [CometChatUIKitConstants.MessageTypes.video]: "video/*",
           [CometChatUIKitConstants.MessageTypes.audio]: "audio/*",
           [CometChatUIKitConstants.MessageTypes.file]: "*/*"
@@ -2391,7 +2424,7 @@ try {
         : fallbackName;
 
     const statusText = isSendingPendingAttachment ? UPLOADING_STATUS_TEXT : undefined;
-    if (pendingAttachment.objectUrl && pendingAttachment.file.type?.startsWith("image/")) {
+    if (pendingAttachment.objectUrl && (pendingAttachment.file.type?.startsWith("image/") || isHeicFile(pendingAttachment.file))) {
       return (
         <CometChatClipboardImagePreview
           imageUrl={pendingAttachment.objectUrl}
@@ -2614,7 +2647,7 @@ try {
         if (user) {
           messageTextTmp = messageTextTmp.replace(
             match[0],
-            "@" + user.getName()
+            "@" + resolveDisplayName(user.getName(), user)
           );
           cometChatUsersGroupMembers.push(user);
         }

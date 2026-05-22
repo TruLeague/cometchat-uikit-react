@@ -5,8 +5,8 @@
   padding: var(--cometchat-padding-2, 8px);
   border-radius: var(--cometchat-radius-3, 12px);
   gap: var(--cometchat-padding-4, 16px);
-  width: 240px;
-  max-width: 240px;
+  min-width: 240px;
+  max-width: 715px;
 }
 .cometchat-polls-bubble  * {
   box-sizing: border-box;
@@ -56,7 +56,7 @@
 }
 
 .cometchat-polls-bubble__question {
-  font: var(--cometchat-font-heading4-bold);
+  font: var(--secondary-color);
   font-style: normal;
   text-align: left;
   width: 100%;
@@ -65,7 +65,7 @@
 }
 
 .cometchat-polls-bubble-incoming .cometchat-polls-bubble__question {
-  color: var(--cometchat-neutral-color-900, #141414);
+  color: var(--secondary-color, #494f73);
 }
 
 .cometchat-polls-bubble-outgoing .cometchat-polls-bubble__question {
@@ -89,6 +89,7 @@
   gap: var(--cometchat-padding-2, 8px);
   width: 100%;
   position: relative;
+  cursor: pointer;
 }
 
 
@@ -157,7 +158,9 @@
 .cometchat-poll-bubble__option-item-body-content {
   display: flex;
   justify-content: space-between;
+  align-items: start;
   width: 100%;
+  gap: var(--cometchat-padding-1, 4px);
 }
 
 .cometchat-poll-bubble__option-item-body-content-title {
@@ -165,12 +168,13 @@
   font-style: normal;
   text-align: left;
   word-wrap: break-word;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
 }
 
 .cometchat-polls-bubble-incoming .cometchat-poll-bubble__option-item-body-content-title {
-  color: var(--cometchat-neutral-color-900, #141414);
+  color: var(--secondary-color, #494f73);
 }
 
 .cometchat-polls-bubble-outgoing .cometchat-poll-bubble__option-item-body-content-title {
@@ -180,10 +184,12 @@
 .cometchat-poll-bubble__option-item-body-content-tail {
   display: flex;
   justify-content: flex-end;
-  max-width: 100px;
+  align-items: center;
+  width: 64px;
+  max-width: 64px;
   position: relative;
   height: 20px;
-  width: fit-content;
+  flex-shrink: 0;
   gap: var(--cometchat-padding-1);
 }
 
@@ -205,7 +211,7 @@
 }
 
 .cometchat-polls-bubble-incoming .cometchat-poll-bubble__option-item-body-content-tail-count {
-  color: var(--cometchat-neutral-color-900, #141414);
+  color: var(--secondary-color, #494f73);
 }
 
 .cometchat-polls-bubble-outgoing .cometchat-poll-bubble__option-item-body-content-tail-count {
@@ -222,11 +228,11 @@
 }
 
 .cometchat-polls-bubble-incoming .cometchat-poll-bubble__option-item-body-progress {
-  background: var(--cometchat-neutral-color-400, #DCDCDC);
+  background: var(--text-secondary-color);
 }
 
 .cometchat-polls-bubble-outgoing .cometchat-poll-bubble__option-item-body-progress {
-  background: var(--cometchat-extended-primary-color-700, #8978DF);
+  background: var(--cometchat-static-white, #FFF);
 }
 
 .cometchat-poll-bubble__option-item-body-progress-background {
@@ -236,16 +242,17 @@
 }
 
 .cometchat-polls-bubble-incoming .cometchat-poll-bubble__option-item-body-progress-background {
-  background: var(--cometchat-primary-color, #6852D6);
+  background: var(--primary-color);
 }
 
 .cometchat-polls-bubble-outgoing .cometchat-poll-bubble__option-item-body-progress-background {
-  background: var(--cometchat-static-white, #FFF);
+  background: var(--primary-color);
 }
 
 
 .cometchat-polls-bubble-incoming .cometchat-radiobutton__selected {
-  border: 1.5px solid var(--cometchat-primary-color, #6852D6);
+  border: 1.5px solid var(--cometchat-static-white, #FFF);
+  background: var(--text-secondary-color);
 }
 
 .cometchat-polls-bubble-outgoing .cometchat-radiobutton__selected {
@@ -253,9 +260,9 @@
 }
 
 .cometchat-polls-bubble-outgoing .cometchat-radiobutton input[type="radio"]:checked+.cometchat-radiobutton__selected {
-  border: 1.5px solid var(--cometchat-static-white, #FFF);
+  border: 1.5px solid var(--cometchat-static-white, #FFF) !important;
 }
 
 .cometchat-polls-bubble-outgoing .cometchat-radiobutton__selected::after {
-  background-color: var(--cometchat-static-white, #FFF);
+  background-color: var(--secondary-color, #FFF);
 }

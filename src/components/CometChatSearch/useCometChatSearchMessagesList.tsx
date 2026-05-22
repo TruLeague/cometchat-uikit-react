@@ -11,6 +11,7 @@ import { CometChatUIKitConstants } from "../../constants/CometChatUIKitConstants
 import { CometChatDate } from "../BaseComponents/CometChatDate/CometChatDate";
 import { CometChatContextMenu } from "../BaseComponents/CometChatContextMenu/CometChatContextMenu";
 import { ChatConfigurator } from "../../utils/ChatConfigurator";
+import { resolveDisplayName } from "../../utils/nameTransformer";
 import { CalendarObject } from "../../utils/CalendarObject";
 import { CometChatButton } from "../BaseComponents/CometChatButton/CometChatButton";
 import { CometChatMentionsFormatter, CometChatTextHighlightFormatter } from "../../formatters";
@@ -569,7 +570,7 @@ export function useCometChatSearchMessagesList(props: UseCometChatSearchMessages
       let user = loggedInUser ?? CometChatUIKitLoginListener.getLoggedInUser();
       const messageText = getFormattedMessageText(message);
       const isMyMessage = message?.getSender().getUid() == user?.getUid();
-      const senderName = isMyMessage ? getLocalizedString("search_message_subtitle_you") : message?.getSender().getName()
+      const senderName = isMyMessage ? getLocalizedString("search_message_subtitle_you") : resolveDisplayName(message?.getSender().getName(), message?.getSender())
       return (
         <>
         {getSubtitleThreadView(message)}
@@ -741,10 +742,11 @@ export function useCometChatSearchMessagesList(props: UseCometChatSearchMessages
 const getMessageTitle = useCallback((message: CometChat.BaseMessage): string => {
   let user = loggedInUser ?? CometChatUIKitLoginListener.getLoggedInUser();
  if(uid || guid){
-   return isMessageSentByMe(message, user! ) ? getLocalizedString("search_message_title_you") : message.getSender()?.getName();
+   const sender = message.getSender();
+   return isMessageSentByMe(message, user! ) ? getLocalizedString("search_message_title_you") : resolveDisplayName(sender?.getName(), sender);
  }
  let receiver = message.getReceiver();
- return receiver.getName();
+ return resolveDisplayName(receiver.getName(), receiver instanceof CometChat.User ? receiver : null);
 
 },[uid,guid,loggedInUser])
   /**

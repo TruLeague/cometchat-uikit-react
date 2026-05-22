@@ -4,6 +4,7 @@ export { CometChatUserMemberWrapper } from "./components/CometChatUserMemberWrap
 export { CometChatUIKit } from './CometChatUIKit/CometChatUIKit';
 export { UIKitSettingsBuilder, UIKitSettings } from './CometChatUIKit/UIKitSettings';
 export { ChatConfigurator } from './utils/ChatConfigurator';
+export { resolveDisplayName } from './utils/nameTransformer';
 export { DataSource } from './utils/DataSource';
 export { DataSourceDecorator } from './utils/DataSourceDecorator';
 export { ExtensionsDataSource } from './components/Extensions/ExtensionsDataSource';

@@ -46,6 +46,7 @@ import { getThemeMode, isURL, sanitizeCalendarObject } from "../../utils/util";
 import { CometChatConversationEvents } from "../../events/CometChatConversationEvents";
 import CometChatToast from "../BaseComponents/CometChatToast/CometChatToast";
 import { CometChatUIKit } from "../../CometChatUIKit/CometChatUIKit";
+import { resolveDisplayName } from "../../utils/nameTransformer";
 import { CalendarObject } from "../../utils/CalendarObject";
 import { MessageUtils } from "../../utils/MessageUtils";
 type Message =
@@ -444,7 +445,15 @@ function stateReducer(state: State, action: Action): State {
         const newConversationList = conversationList.map((conv, i) => {
           if (i === targetIdx) {
             const newConv = CometChatUIKitUtility.clone(conv);
-            newConv.setConversationWith(user);
+            const existingUser = newConv.getConversationWith() as CometChat.User;
+            // Only update status from the presence event — preserve existing
+            // role, metadata, name, avatar etc. that may be missing from the
+            // lightweight WebSocket presence payload.
+            existingUser.setStatus(user.getStatus());
+            if (user.getLastActiveAt()) {
+              existingUser.setLastActiveAt(user.getLastActiveAt());
+            }
+            newConv.setConversationWith(existingUser);
             return newConv;
           }
           return conv;
@@ -1345,7 +1354,7 @@ export function CometChatConversations(props: ConversationsProps) {
         if (convWith instanceof CometChat.Group) {
           return (
             <div className="cometchat-conversations__subtitle-typing">
-              {typingIndicator.getSender().getName()}
+              {resolveDisplayName(typingIndicator.getSender().getName(), typingIndicator.getSender())}
               {": "}
               {getLocalizedString("conversation_subtitle_typing")}
             </div>
@@ -1784,7 +1793,7 @@ export function CometChatConversations(props: ConversationsProps) {
           conversationType === CometChatUIKitConstants.MessageReceiverType.user
         ) {
           let user = conversation.getConversationWith() as CometChat.User;
-          status = user.getStatus();
+          status = MessageUtils.isUserOnline(user) ? CometChatUIKitConstants.userStatusType.online : CometChatUIKitConstants.userStatusType.offline;
           userBlockedFlag =
             new MessageUtils().getUserStatusVisible(user) || hideUserStatus;
         }
@@ -1812,8 +1821,8 @@ export function CometChatConversations(props: ConversationsProps) {
             <CometChatListItem
               id={conversation.getConversationId()}
               avatarURL={getListItemAvatarURL(conversation)}
-              avatarName={conversation.getConversationWith().getName()}
-              title={conversation.getConversationWith().getName()}
+              avatarName={resolveDisplayName(conversation.getConversationWith().getName(), conversation.getConversationType() === "user" ? conversation.getConversationWith() as CometChat.User : null)}
+              title={resolveDisplayName(conversation.getConversationWith().getName(), conversation.getConversationType() === "user" ? conversation.getConversationWith() as CometChat.User : null)}
               titleView={titleView ? titleView(conversation) : undefined}
               leadingView={leadingView ? leadingView(conversation) : undefined}
               onListItemClicked={(e) => onItemClick?.(conversation)}

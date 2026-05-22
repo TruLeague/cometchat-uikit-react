@@ -18,6 +18,7 @@ import { CollaborativeDocumentConstants } from "../Extensions/CollaborativeDocum
 import { CometChatContextMenu } from "../BaseComponents/CometChatContextMenu/CometChatContextMenu";
 import { getThemeMode, isURL, sanitizeCalendarObject, encryptName } from "../../utils/util";
 import { ChatConfigurator } from "../../utils/ChatConfigurator";
+import { resolveDisplayName } from "../../utils/nameTransformer";
 import { CometChatButton } from "../BaseComponents/CometChatButton/CometChatButton";
 import { CometChatCallEvents } from "../../events/CometChatCallEvents";
 import { CometChatMessageEvents } from "../../events/CometChatMessageEvents";
@@ -1523,7 +1524,7 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
         if (convWith instanceof CometChat.Group) {
           return (
             <div className="cometchat-search__conversations-subtitle-typing">
-              {typingIndicator.getSender().getName()}
+              {resolveDisplayName(typingIndicator.getSender().getName(), typingIndicator.getSender())}
               {": "}
               {getLocalizedString("conversation_subtitle_typing")}
             </div>
@@ -1548,7 +1549,7 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
         const isMessageFromLoggedInUser = lastMessage?.getSender().getUid() == currentLoggedInUser.getUid();
         const getLastMessageSenderName = isMessageFromLoggedInUser
           ? getLocalizedString("conversation_subtitle_you_message")
-          : lastMessage?.getSender().getName();
+          : resolveDisplayName(lastMessage?.getSender().getName(), lastMessage?.getSender());
 
         let subtitle = ChatConfigurator.getDataSource().getLastConversationMessage(
           conversation,
@@ -1757,7 +1758,7 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
 
         if (conversationType === CometChatUIKitConstants.MessageReceiverType.user) {
           const user = (conversation.getConversationWith() as CometChat.User);
-          status = user.getStatus();
+          status = MessageUtils.isUserOnline(user) ? CometChatUIKitConstants.userStatusType.online : CometChatUIKitConstants.userStatusType.offline;
           userBlockedFlag = new MessageUtils().getUserStatusVisible(user) || hideUserStatus;
         }
 
@@ -1770,8 +1771,8 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
             <CometChatListItem
               id={conversation.getConversationId()}
               avatarURL={getListItemAvatarURL(conversation)}
-              avatarName={conversation.getConversationWith().getName()}
-              title={conversation.getConversationWith().getName()}
+              avatarName={resolveDisplayName(conversation.getConversationWith().getName(), conversation.getConversationType() === "user" ? conversation.getConversationWith() as CometChat.User : null)}
+              title={resolveDisplayName(conversation.getConversationWith().getName(), conversation.getConversationType() === "user" ? conversation.getConversationWith() as CometChat.User : null)}
               titleView={titleView ? titleView(conversation) : undefined}
               leadingView={leadingView ? leadingView(conversation) : undefined}
               onListItemClicked={(e) => onItemClick?.(conversation,searchKeyword)}

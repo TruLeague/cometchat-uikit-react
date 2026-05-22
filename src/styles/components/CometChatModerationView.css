@@ -10,16 +10,39 @@
 
 .cometchat-moderation-status {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: flex-start;
     background-color: var(--cometchat-error-color-100);
     padding: var(--cometchat-padding-1) var(--cometchat-padding-2);
-    gap: var(--cometchat-spacing-1, 4px);
+    gap: var(--cometchat-spacing-2, 8px);
     border-radius: 0 0 var(--cometchat-radius-3, 12px) var(--cometchat-radius-3, 12px);
+}
+
+.cometchat-moderation-status--header-wrapper{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 .cometchat-moderation-status .cometchat-moderation-status__message {
     color: var(--cometchat-error-color, #F44649);
     text-align: left;
     font: var(--cometchat-font-body-regular);
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.cometchat-moderation-status .cometchat-moderation-status__flagged-words {
+    color: var(--cometchat-error-color, #F44649);
+    text-align: left;
+    font: var(--cometchat-font-caption1-regular);
+}
+
+.cometchat-moderation-status .cometchat-moderation-status__flagged-label {
+    font: var(--cometchat-font-caption1-medium);
+}
+
+.cometchat-moderation-status .cometchat-moderation-status__flagged-word {
+    font: var(--cometchat-font-caption1-regular);
+    font-style: italic;
 }

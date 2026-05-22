@@ -4,6 +4,7 @@ import { MentionsTargetElement, MentionsVisibility, MessageBubbleAlignment, Mous
 import { CometChatUIKitLoginListener } from "../../../CometChatUIKit/CometChatUIKitLoginListener";
 import { CometChatUtilityConstants } from "../../../constants/CometChatUtilityConstants";
 import { CometChatUIEvents } from "../../../events/CometChatUIEvents";
+import { resolveDisplayName } from "../../../utils/nameTransformer";
 
 interface mentionsCssClassType {
   [key: string]: CometChat.User | CometChat.GroupMember | null;
@@ -399,7 +400,7 @@ export class CometChatMentionsFormatter extends CometChatTextFormatter {
 
         const textSpan = document.createElement("span");
 
-        textSpan.textContent = this.trackCharacter + userName;
+        textSpan.textContent = this.trackCharacter + resolveDisplayName(userName, this.cometChatUserGroupMembers[i]);
         textSpan.classList.add("cometchat-text");
         span.appendChild(textSpan);
 
@@ -779,7 +780,7 @@ export class CometChatMentionsFormatter extends CometChatTextFormatter {
             if (alreadyMapped) {
               textSpan.textContent = capturedGroup;
             } else {
-              textSpan.textContent = "@" + cometChatUserGroupMember!.getName();
+              textSpan.textContent = "@" + resolveDisplayName(cometChatUserGroupMember!.getName(), cometChatUserGroupMember);
               this.mentionsMap![
                 "mentions-" + cometChatUserGroupMember!.getUid()
               ] = `<@uid:${cometChatUserGroupMember!.getUid()}>`;

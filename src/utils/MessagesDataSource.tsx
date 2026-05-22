@@ -3,6 +3,7 @@ import { CometChat } from "@cometchat/chat-sdk-javascript";
 import { DataSource } from "./DataSource";
 import React, { JSX } from "react";
 import { CometChatUIKitLoginListener } from "../CometChatUIKit/CometChatUIKitLoginListener";
+import { resolveDisplayName } from "./nameTransformer";
 import { ConversationUtils, additionalParams } from "./ConversationUtils";
 import { CometChatMentionsFormatter } from "../formatters/CometChatFormatters/CometChatMentionsFormatter/CometChatMentionsFormatter";
 import { CometChatUrlsFormatter } from "../formatters/CometChatFormatters/CometChatUrlsFormatter/CometChatUrlsFormatter";
@@ -384,7 +385,7 @@ getMessageSentAtDateFormat(messageSentAtDateTimeFormat?:CalendarObject) {
         <div
           className="cometchat-message-bubble__status-info-view"
         >
-          {!_messageObject.getDeletedAt() && _messageObject.getType() == CometChatUIKitConstants.MessageTypes.text && _messageObject.getEditedAt() ? <span className="cometchat-message-bubble__status-info-view-helper-text">  {getLocalizedString("message_list_action_edited")} </span> : null}
+          {!_messageObject.getDeletedAt() && _messageObject.getType() == CometChatUIKitConstants.MessageTypes.text && _messageObject.getEditedAt() && !(_messageObject as any).getMetadata?.()?.profanity ? <span className="cometchat-message-bubble__status-info-view-helper-text">  {getLocalizedString("message_list_action_edited")} </span> : null}
 
           {this.getBubbleStatusInfoDate(_messageObject, messageSentAtDateTimeFormat)}
           {!hideReceipts && this.getBubbleStatusInfoReceipt(_messageObject, hideReceipts,showError)}
@@ -980,7 +981,8 @@ getMessageSentAtDateFormat(messageSentAtDateTimeFormat?:CalendarObject) {
     if (!messageObject?.getParentMessageId() && !additionalParams?.hideReplyInThreadOption) {
       messageOptionList.push(this.getReplyInThreadOption());
     }
-    if (isSentByMe && !additionalParams?.hideMessageInfoOption) {
+    const isPollMessage = messageObject?.getType?.() === PollsConstants.extension_poll;
+    if ((isSentByMe || isPollMessage) && !additionalParams?.hideMessageInfoOption) {
       messageOptionList.push(this.getMessageInfoOption());
     }
     if ((isSentByMe || (!isParticipant && group)) && !additionalParams?.hideDeleteMessageOption)
@@ -1201,7 +1203,15 @@ getMessageSentAtDateFormat(messageSentAtDateTimeFormat?:CalendarObject) {
     text?: string,
     alignment?: MessageBubbleAlignment
   ) {
-    return <CometChatDeleteBubble isSentByMe={alignment == MessageBubbleAlignment.right} text={text} />;
+    let displayText = text;
+    if (!displayText) {
+      const deletedBy = message?.getDeletedBy?.();
+      const loggedInUid = CometChatUIKitLoginListener.getLoggedInUser()?.getUid();
+      if (deletedBy && loggedInUid && deletedBy === loggedInUid) {
+        displayText = "You deleted this message.";
+      }
+    }
+    return <CometChatDeleteBubble isSentByMe={alignment == MessageBubbleAlignment.right} text={displayText} />;
   }
 
   getGroupActionBubble(
@@ -1774,7 +1784,7 @@ getMessagePreviewTitle(message: CometChat.BaseMessage, _alignment?: MessageBubbl
     const isSentByMe = message.getSender().getUid() === CometChatUIKitLoginListener.getLoggedInUser()?.getUid();
     return (
       <div className={`cometchat-message-preview__title`}>
-        {isSentByMe ? getLocalizedString("conversation_subtitle_you_message") : message.getSender().getName()}
+        {isSentByMe ? getLocalizedString("conversation_subtitle_you_message") : resolveDisplayName(message.getSender().getName(), message.getSender())}
       </div>
     );
 }

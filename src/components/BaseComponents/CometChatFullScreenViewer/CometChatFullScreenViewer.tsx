@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { convertHeicBlobToObjectUrl, isHeicFile } from '../../../utils/heicSupport';
 import { CometChatListItem } from '../CometChatListItem/CometChatListItem';
 import { CometChatLocalize } from '../../../resources/CometChatLocalize/cometchat-localize';
 import {getLocalizedString} from '../../../resources/CometChatLocalize/cometchat-localize';
 import { CalendarObject } from '../../../utils/CalendarObject';
 import { sanitizeCalendarObject } from '../../../utils/util';
+import { resolveDisplayName } from '../../../utils/nameTransformer';
 
 /**
  * Props for the CometChatFullScreenViewer component.
@@ -97,13 +99,15 @@ const CometChatFullScreenViewer: React.FC<FullScreenViewerProps> = ({
     useEffect(() => {
         const updateImage = () => {
             downloadImage(url)
-                .then((response) => {
-                    const img = new Image();
-                    img.src = url;
-                    img.onload = () => {
-                     setIsDownloading(false)
-                        setImage(img.src);
-                    };
+                .then(async (response) => {
+                    if (isHeicFile(url)) {
+                        const converted = await convertHeicBlobToObjectUrl(response as Blob, url);
+                        setIsDownloading(false);
+                        setImage(converted ?? url);
+                    } else {
+                        setIsDownloading(false);
+                        setImage(url);
+                    }
                 })
                 .catch(() => {
                     setImage(url);
@@ -225,9 +229,9 @@ const CometChatFullScreenViewer: React.FC<FullScreenViewerProps> = ({
                 <div className="cometchat-fullscreen-viewer__header">
                     <div className='cometchat-fullscreen-viewer__header-item'>
                         <CometChatListItem
-                            avatarName={message?.getSender()?.getName()}
+                            avatarName={resolveDisplayName(message?.getSender()?.getName() || "", message?.getSender())}
                             avatarURL={message?.getSender()?.getAvatar()}
-                            title={message?.getSender()?.getName()}
+                            title={resolveDisplayName(message?.getSender()?.getName() || "", message?.getSender())}
                             subtitleView={
                                 `${CometChatLocalize.formatDate(message?.getSentAt(),getDateFormat())}`}
                         />

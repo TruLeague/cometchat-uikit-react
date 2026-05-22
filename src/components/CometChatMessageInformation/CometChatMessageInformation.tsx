@@ -13,6 +13,7 @@ import { MessageBubbleAlignment, States } from "../../Enums/Enums";
 import closeIcon from "../../assets/close.svg";
 import { CometChatDate } from "../BaseComponents/CometChatDate/CometChatDate";
 import { useCometChatErrorHandler } from "../../CometChatCustomHooks";
+import { resolveDisplayName } from "../../utils/nameTransformer";
 import { CalendarObject } from "../../utils/CalendarObject";
 import { CometChatTextFormatter } from "../../formatters";
 import { JSX } from 'react';
@@ -222,9 +223,9 @@ const CometChatMessageInformation = (props: MessageInformationProps) => {
       return (
         <CometChatListItem
           id={messageReceipt.getMessageId()}
-          title={messageReceipt.getSender()?.getName()}
+          title={resolveDisplayName(messageReceipt.getSender()?.getName() || "", messageReceipt.getSender())}
           avatarURL={messageReceipt.getSender()?.getAvatar()}
-          avatarName={messageReceipt.getSender()?.getName()}
+          avatarName={resolveDisplayName(messageReceipt.getSender()?.getName() || "", messageReceipt.getSender())}
           subtitleView={getSubtitleView(
             messageReceipt.getDeliveredAt(),
             messageReceipt.getReadAt()
