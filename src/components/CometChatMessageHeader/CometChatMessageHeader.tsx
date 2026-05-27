@@ -20,6 +20,7 @@ import { sanitizeCalendarObject } from "../../utils/util";
 import { ComposerId } from "../../utils/MessagesDataSource";
 import { CometChatContextMenu } from "../BaseComponents/CometChatContextMenu/CometChatContextMenu";
 import { CometChatOption } from "../../modals";
+import { resolveDisplayName } from "../../utils/nameTransformer";
 
 /**
  * Interface for the props accepted by the CometChatMessageHeader component.
@@ -419,7 +420,7 @@ export const CometChatMessageHeader = (props: MessageHeaderProps) => {
                 }
                 if (groupRef?.current?.getGuid() === receiverId) {
                     isTypingRef.current = true;
-                    setSubtitleText(`${sender?.getName()}: ${getLocalizedString("message_header_typing")}`);
+                    setSubtitleText(`${resolveDisplayName(sender?.getName() || "", sender)}: ${getLocalizedString("message_header_typing")}`);
                 }
             }
 
@@ -584,9 +585,9 @@ export const CometChatMessageHeader = (props: MessageHeaderProps) => {
                 return itemView;
             } else {
                 return (
-                    <CometChatListItem style={messageHeaderStyle} onListItemClicked={onItemClick} avatarName={userRef.current?.getName() || groupRef.current?.getName()}
+                    <CometChatListItem style={messageHeaderStyle} onListItemClicked={onItemClick} avatarName={resolveDisplayName(userRef.current?.getName() || groupRef.current?.getName() || "", userRef.current || null)}
                         avatarURL={userRef.current?.getAvatar() || groupRef.current?.getIcon() || ""}
-                        title={userRef.current?.getName() || groupRef.current?.getName() || ""} subtitleView={getSubtitleView()} titleView={titleView} trailingView={trailingView} leadingView={leadingView} />
+                        title={resolveDisplayName(userRef.current?.getName() || groupRef.current?.getName() || "", userRef.current || null)} subtitleView={getSubtitleView()} titleView={titleView} trailingView={trailingView} leadingView={leadingView} />
                 )
             }
         } catch (error) {

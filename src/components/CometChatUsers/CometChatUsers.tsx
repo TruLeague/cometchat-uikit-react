@@ -26,6 +26,7 @@ import errorIconDark from "../../assets/list_error_state_icon_dark.svg"
 import { getThemeMode } from "../../utils/util";
 import { CometChatUIKitConstants } from "../../constants/CometChatUIKitConstants";
 import { MessageUtils } from "../../utils/MessageUtils";
+import { resolveDisplayName } from "../../utils/nameTransformer";
 
 export interface UsersProps {
   /**
@@ -571,8 +572,8 @@ export function CometChatUsers(props: UsersProps) {
               stopEventPropagation={true}
               id={user.getUid()}
               avatarURL={user.getAvatar()}
-              avatarName={user.getName()}
-              title={user.getName()}
+              avatarName={resolveDisplayName(user.getName(), user)}
+              title={resolveDisplayName(user.getName(), user)}
               titleView={titleView?.(user)}
               leadingView={leadingView?.(user)}
               subtitleView={subtitleView?.(user)}

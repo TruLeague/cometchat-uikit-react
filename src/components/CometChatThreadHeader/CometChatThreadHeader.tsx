@@ -18,6 +18,7 @@ import { CalendarObject } from "../../utils/CalendarObject";
 import { sanitizeCalendarObject } from "../../utils/util";
 import {CometChatTextFormatter } from "../../formatters";
 import { JSX } from 'react';
+import { resolveDisplayName } from "../../utils/nameTransformer";
 interface CometChatThreadHeaderProps {
     /**
      * Hides the visibility of the date header.
@@ -395,7 +396,7 @@ const CometChatThreadHeader = (props: CometChatThreadHeaderProps) => {
                     className={`cometchat-thread-header__top-bar-subtitle-text ${onSubtitleClicked ? "cometchat-thread-header__top-bar-subtitle-text-clickable" : ""}`}
                     onClick={onClick}
                 >
-                    {parentMessage.getSender().getName()}
+                    {resolveDisplayName(parentMessage.getSender().getName(), parentMessage.getSender())}
                 </div>
             );
         }

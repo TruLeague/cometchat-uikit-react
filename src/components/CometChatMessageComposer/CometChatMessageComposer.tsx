@@ -43,6 +43,7 @@ import { decodeHTML, getThemeVariable, isMobileDevice, isSafari, isSvgFile, proc
 import { convertHeicFileToJpeg, isHeicFile } from '../../utils/heicSupport';
 import { CometChatMessageEvents } from '../../events/CometChatMessageEvents';
 import { CometChatUIEvents } from '../../events/CometChatUIEvents';
+import { resolveDisplayName } from '../../utils/nameTransformer';
 import { CometChatSoundManager } from "../../resources/CometChatSoundManager/CometChatSoundManager";
 import { useCometChatFrameContext } from "../../context/CometChatFrameContext";
 import { CometChatMessagePreview } from "../BaseComponents/CometChatMessagePreview/CometChatMessagePreview";
@@ -1139,12 +1140,16 @@ try {
         if (mentionedUsers) {
           let userObj = [];
           for (let i = 0; i < mentionedUsers.length; i++) {
-            userObj.push(
-              new CometChat.User({
-                uid: mentionedUsers[i].getUid(),
-                name: mentionedUsers[i].getName(),
-              })
-            );
+            const u = new CometChat.User({
+              uid: mentionedUsers[i].getUid(),
+              name: mentionedUsers[i].getName(),
+              role: mentionedUsers[i].getRole(),
+            });
+            const meta = mentionedUsers[i].getMetadata();
+            if (meta) {
+              u.setMetadata(meta);
+            }
+            userObj.push(u);
           }
           if (messageToReplyRef.current){
             textMessage.setQuotedMessage(messageToReplyRef.current);
@@ -2648,7 +2653,7 @@ try {
         if (user) {
           messageTextTmp = messageTextTmp.replace(
             match[0],
-            "@" + user.getName()
+            "@" + resolveDisplayName(user.getName(), user)
           );
           cometChatUsersGroupMembers.push(user);
         }

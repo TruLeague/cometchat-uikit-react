@@ -3,6 +3,7 @@ import { CometChat } from "@cometchat/chat-sdk-javascript";
 import { DataSource } from "./DataSource";
 import React, { JSX } from "react";
 import { CometChatUIKitLoginListener } from "../CometChatUIKit/CometChatUIKitLoginListener";
+import { resolveDisplayName } from "./nameTransformer";
 import { ConversationUtils, additionalParams } from "./ConversationUtils";
 import { CometChatMentionsFormatter } from "../formatters/CometChatFormatters/CometChatMentionsFormatter/CometChatMentionsFormatter";
 import { CometChatUrlsFormatter } from "../formatters/CometChatFormatters/CometChatUrlsFormatter/CometChatUrlsFormatter";
@@ -1783,7 +1784,7 @@ getMessagePreviewTitle(message: CometChat.BaseMessage, _alignment?: MessageBubbl
     const isSentByMe = message.getSender().getUid() === CometChatUIKitLoginListener.getLoggedInUser()?.getUid();
     return (
       <div className={`cometchat-message-preview__title`}>
-        {isSentByMe ? getLocalizedString("conversation_subtitle_you_message") : message.getSender().getName()}
+        {isSentByMe ? getLocalizedString("conversation_subtitle_you_message") : resolveDisplayName(message.getSender().getName(), message.getSender())}
       </div>
     );
 }
