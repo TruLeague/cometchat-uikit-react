@@ -46,6 +46,8 @@ const CometChatMediaRecorder = forwardRef<CometChatMediaRecorderHandle, MediaRec
     const inlineAudioRef = useRef<HTMLAudioElement | null>(null);
     const [isPlayingPreview, setIsPlayingPreview] = useState(false);
     const [playbackTime, setPlaybackTime] = useState(0);
+    const playbackIntervalRef = useRef<number | undefined>(undefined);
+    const previousSegmentsRef = useRef<Blob[]>([]);
 
     useImperativeHandle(ref, () => ({
         submit: () => {
@@ -169,7 +171,8 @@ const CometChatMediaRecorder = forwardRef<CometChatMediaRecorderHandle, MediaRec
             };
             audioRecorder.onstop = () => {
                 if (createMedia.current && audioChunks.current.length > 0) {
-                    const recordedBlob = new Blob(audioChunks.current, {
+                    const allChunks = [...previousSegmentsRef.current, ...audioChunks.current];
+                    const recordedBlob = new Blob(allChunks, {
                         type: audioChunks.current[0]?.type || 'audio/webm',
                     });
                     blobRef.current = recordedBlob;
@@ -182,6 +185,7 @@ const CometChatMediaRecorder = forwardRef<CometChatMediaRecorderHandle, MediaRec
                         setMediaPreviewUrl(url);
                     }
                     audioChunks.current = [];
+                    previousSegmentsRef.current = [];
                 }
             };
                         
@@ -296,6 +300,30 @@ const CometChatMediaRecorder = forwardRef<CometChatMediaRecorderHandle, MediaRec
             }
         }
     };
+
+    const handleResumeRecording = async () => {
+        if (permissionRequestPending.current) return;
+        pauseActiveMedia();
+        counterRunning.current = true;
+        createMedia.current = true;
+        hasInitializedRef.current = false;
+        permissionRequestPending.current = true;
+        try {
+            const recorder = await initMediaRecorder();
+            if (recorder) {
+                currentMediaPlayer.mediaRecorder = recorder;
+                startTimer();
+                setIsRecording(true);
+                setHasError(false);
+            } else {
+                setIsRecording(false);
+                createMedia.current = false;
+            }
+        } finally {
+            permissionRequestPending.current = false;
+        }
+    };
+
     const handleStopRecording = () => {
         setIsPaused(false);
         pauseActiveMedia();
@@ -336,6 +364,7 @@ const CometChatMediaRecorder = forwardRef<CometChatMediaRecorderHandle, MediaRec
         clearStream();
         audioChunks.current = [];
         blobRef.current = undefined;
+        previousSegmentsRef.current = [];
         permissionRequestPending.current = false;
     };
 
@@ -493,23 +522,27 @@ const CometChatMediaRecorder = forwardRef<CometChatMediaRecorderHandle, MediaRec
         if (!mediaPreviewUrl) return;
         if (isPlayingPreview && inlineAudioRef.current) {
             inlineAudioRef.current.pause();
+            clearInterval(playbackIntervalRef.current);
             setIsPlayingPreview(false);
             return;
         }
         if (!inlineAudioRef.current) {
             inlineAudioRef.current = new Audio(mediaPreviewUrl);
             inlineAudioRef.current.onended = () => {
+                clearInterval(playbackIntervalRef.current);
                 setIsPlayingPreview(false);
                 setPlaybackTime(0);
             };
-            inlineAudioRef.current.ontimeupdate = () => {
-                if (inlineAudioRef.current) {
-                    setPlaybackTime(Math.floor(inlineAudioRef.current.currentTime));
-                }
-            };
         }
+        setPlaybackTime(0);
         inlineAudioRef.current.play();
         setIsPlayingPreview(true);
+        clearInterval(playbackIntervalRef.current);
+        const startTime = Date.now();
+        playbackIntervalRef.current = window.setInterval(() => {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            setPlaybackTime(elapsed);
+        }, 200);
     };
 
     // Cleanup audio on unmount or URL change
@@ -519,6 +552,7 @@ const CometChatMediaRecorder = forwardRef<CometChatMediaRecorderHandle, MediaRec
                 inlineAudioRef.current.pause();
                 inlineAudioRef.current = null;
             }
+            clearInterval(playbackIntervalRef.current);
         };
     }, [mediaPreviewUrl]);
 
@@ -599,14 +633,30 @@ const CometChatMediaRecorder = forwardRef<CometChatMediaRecorderHandle, MediaRec
                                 </div>
                                 <div
                                     className="cometchat-media-recorder-inline__mic"
-                                    onClick={() => { reset(); handleStartRecording(); }}
+                                    onClick={() => {
+                                        if (blobRef.current) {
+                                            previousSegmentsRef.current.push(blobRef.current);
+                                            blobRef.current = undefined;
+                                            setMediaPreviewUrl(undefined);
+                                            handleResumeRecording();
+                                        } else {
+                                            reset(); handleStartRecording();
+                                        }
+                                    }}
                                     role="button"
                                     tabIndex={0}
-                                    aria-label="Record new"
+                                    aria-label={blobRef.current ? "Resume recording" : "Record new"}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter' || e.key === ' ') {
                                             e.preventDefault();
-                                            reset(); handleStartRecording();
+                                            if (blobRef.current) {
+                                                previousSegmentsRef.current.push(blobRef.current);
+                                                blobRef.current = undefined;
+                                                setMediaPreviewUrl(undefined);
+                                                handleResumeRecording();
+                                            } else {
+                                                reset(); handleStartRecording();
+                                            }
                                         }
                                     }}
                                 >
