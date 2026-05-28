@@ -457,8 +457,10 @@ const CometChatMediaRecorder = forwardRef<CometChatMediaRecorderHandle, MediaRec
         }
     }, [permissionState, hasError, mediaPreviewUrl, isRecording, autoRecording]);
 
-    // Store previous focus and auto-focus first interactive element on mount
+    // Store previous focus and auto-focus first interactive element on mount (only for non-inline/modal mode)
     useEffect(() => {
+        if (inline) return;
+
         previousFocusRef.current = document.activeElement as HTMLElement;
         
         // Focus first interactive element
@@ -476,8 +478,10 @@ const CometChatMediaRecorder = forwardRef<CometChatMediaRecorderHandle, MediaRec
         };
     }, []);
 
-    // Focus trap: keep focus inside the recorder and handle Escape
+    // Focus trap: keep focus inside the recorder and handle Escape (only for non-inline/modal mode)
     useEffect(() => {
+        if (inline) return;
+
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
                 e.preventDefault();
