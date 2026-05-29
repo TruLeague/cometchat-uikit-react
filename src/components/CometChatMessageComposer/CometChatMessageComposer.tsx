@@ -34,7 +34,7 @@ import { EnterKeyBehavior, MentionsTargetElement, MessageStatus, Placement, Prev
 import {getLocalizedString} from "../../resources/CometChatLocalize/cometchat-localize";
 import { CometChatButton } from "../BaseComponents/CometChatButton/CometChatButton";
 import { CometChatPopover } from "../BaseComponents/CometChatPopover/CometChatPopover";
-import { CometChatMediaRecorder } from "../BaseComponents/CometChatMediaRecorder/CometChatMediaRecorder";
+import { CometChatMediaRecorder, CometChatMediaRecorderHandle } from "../BaseComponents/CometChatMediaRecorder/CometChatMediaRecorder";
 import { CometChatEditPreview } from "../BaseComponents/CometChatEditPreview/CometChatEditPreview";
 import { CometChatActionSheet } from "../BaseComponents/CometChatActionSheet/CometChatActionSheet";
 import { CometChatEmojiKeyboard } from "../BaseComponents/CometChatEmojiKeyboard/CometChatEmojiKeyboard";
@@ -494,10 +494,7 @@ export function CometChatMessageComposer(props: MessageComposerProps) {
     openPopover: () => void;
     closePopover: () => void;
   }>();
-  const voiceRecordingBtnRef = React.createRef<{
-    openPopover: () => void;
-    closePopover: () => void;
-  }>();
+  const mediaRecorderRef = React.useRef<CometChatMediaRecorderHandle>(null);
   /**
  * Processes a file by reading its binary content and creating a new File object.
  * SVG files are sanitized to remove potentially malicious content before processing.
@@ -706,7 +703,6 @@ try {
       aiBtnRef.current?.closePopover();
       attachmentsBtnRef.current?.closePopover();
       emojiBtnRef.current?.closePopover();
-      voiceRecordingBtnRef.current?.closePopover();
     }
   })
   return () => {
@@ -1468,7 +1464,6 @@ try {
   const handleSendVoiceMessage = useCallback(
     async (blob: Blob): Promise<void> => {
       onVoiceRecordingBtnClick();
-      voiceRecordingBtnRef.current?.closePopover();
       try {
         const audioFile = new File(
           [blob],
@@ -1483,7 +1478,7 @@ try {
         errorHandler(error,"handleSendVoiceMessage");
       }
     },
-    [handleMediaMessageSend, errorHandler, voiceRecordingBtnRef]
+    [handleMediaMessageSend, errorHandler]
   );
 
   /**
@@ -1869,6 +1864,8 @@ try {
    */
   function getMicOrSendButton(): JSX.Element {
     const showSend = shouldShowSendButton();
+    const isRecordingActive = state.contentToDisplay === "voiceRecording";
+
     // If editing a message, only show send button, never mic
     if (state.textMessageToEdit !== null) {
       if (sendButtonView) {
@@ -1885,44 +1882,38 @@ try {
       );
     }
 
+    // Show send button when voice recording is active
+    if (isRecordingActive) {
+      return (
+        <div className="cometchat-message-composer__send-button cometchat-message-composer__send-button-active">
+          <CometChatButton
+            onClick={() => mediaRecorderRef.current?.submit()}
+            iconURL={SendIconFill}
+            hoverText={getLocalizedString("message_composer_send_message_icon_hover")}
+          />
+        </div>
+      );
+    }
+
     // Show mic icon when composer is empty
     if (!showSend && !hideVoiceRecordingButton) {
       const micButton = (
         <div
-          className={`cometchat-message-composer__voice-recording-action ${state.contentToDisplay === "voiceRecording" ? "cometchat-message-composer__voice-recording-action-active" : ""}`}
+          className={`cometchat-message-composer__voice-recording-action`}
         >
           <CometChatButton
             onClick={onVoiceRecordingBtnClick}
             hoverText={getLocalizedString(
               "message_composer_voice_notes_icon_hover"
             )}
-            iconURL={
-              state.contentToDisplay === "voiceRecording"
-                ? MicIconFill
-                : MicIcon
-            }
+            iconURL={MicIcon}
           />
         </div>
       );
 
       return (
-        <div className={`cometchat-message-composer__voice-recording-button ${state.contentToDisplay === "voiceRecording" ? "cometchat-message-composer__voice-recording-button-active" : ""}`}>
-          <CometChatPopover
-            useParentHeight={false}
-            useParentContainer={true}
-            ref={voiceRecordingBtnRef}
-            placement={Placement.top}
-            closeOnOutsideClick={false}
-            content={state.contentToDisplay === "voiceRecording"
-              ? <CometChatMediaRecorder
-                  onSubmitRecording={handleSendVoiceMessage}
-                  onCloseRecording={handleVoiceRecordingClose}
-                  autoRecording={true}
-                />
-              : null}
-          >
-            {micButton}
-          </CometChatPopover>
+        <div className="cometchat-message-composer__voice-recording-button">
+          {micButton}
         </div>
       );
     }
@@ -1955,7 +1946,6 @@ try {
         });
         break;
       case "voiceRecording":
-        voiceRecordingBtnRef.current?.closePopover()
 
         dispatch({
           type: "setContentToDisplay",
@@ -2252,7 +2242,6 @@ try {
         });
         break;
       case "voiceRecording":
-        voiceRecordingBtnRef.current?.closePopover()
         dispatch({
           type: "setContentToDisplay",
           contentToDisplay: "attachments",
@@ -2281,7 +2270,7 @@ try {
    } catch (error) {
     errorHandler(error,"onSecondaryBtnClick")
    }
-    }, [state.contentToDisplay,voiceRecordingBtnRef,aiBtnRef,emojiBtnRef]
+    }, [state.contentToDisplay,aiBtnRef,emojiBtnRef]
   )
 
   function onEditPreviewClose(){
@@ -2501,7 +2490,6 @@ try {
 
   function handleVoiceRecordingClose() {
     try {
-      voiceRecordingBtnRef.current?.closePopover();
       dispatch({
         type: "setContentToDisplay",
         contentToDisplay: "none",
@@ -2510,52 +2498,6 @@ try {
     } catch (error) {
       errorHandler(error, "handleVoiceRecordingClose");
     }
-  }
-
-  /**
-    * Creates the voice recording view, including the media recorder 
-    * and a button to initiate voice recording. The button's appearance 
-    * changes based on the current state of the composer.
-    */
-  function getVoiceRecordingView(): JSX.Element | null {
-    const defaultSecondaryContent = (
-      <CometChatMediaRecorder
-        onSubmitRecording={handleSendVoiceMessage}
-        onCloseRecording={handleVoiceRecordingClose}
-        autoRecording={true}
-      />
-
-    );
-
-    const defaultSecondaryBtn = (
-      <CometChatButton
-        onClick={onVoiceRecordingBtnClick}
-        hoverText={getLocalizedString("message_composer_voice_notes_icon_hover")}
-        iconURL={
-          state.contentToDisplay === "voiceRecording"
-            ? MicIconFill
-            : MicIcon
-        }
-      />
-    );
-
-    return (
-      <div className={`cometchat-message-composer__voice-recording-button ${state.contentToDisplay === "voiceRecording" ? "cometchat-message-composer__voice-recording-button-active" : ""}`}>
-        <CometChatPopover
-          useParentHeight={false}
-          useParentContainer={true}
-          ref={voiceRecordingBtnRef}
-          placement={Placement.top}
-          closeOnOutsideClick={false}
-          content={state.contentToDisplay === "voiceRecording"
-            ? defaultSecondaryContent
-            : null}
-        >
-          {defaultSecondaryBtn}
-
-        </CometChatPopover>
-      </div>
-    );
   }
 
   /**
@@ -3075,6 +3017,16 @@ try {
           </div>
         )}
         <div className={`cometchat-message-composer__input-wrapper ${hasAttachmentButton ? "cometchat-message-composer__input-wrapper--with-attachment" : ""}`}>
+        {isRecording ? (
+          <CometChatMediaRecorder
+            ref={mediaRecorderRef}
+            onSubmitRecording={handleSendVoiceMessage}
+            onCloseRecording={handleVoiceRecordingClose}
+            autoRecording={true}
+            inline={true}
+          />
+        ) : (
+        <>
         <div
           onKeyUp={onKeyUp}
           onKeyDown={onKeyDown}
@@ -3111,6 +3063,8 @@ try {
           >
           {getDefaultButtons()}
           </div>
+        </>
+        )}
         </div>
         <div
           className='cometchat-message-composer__buttons'

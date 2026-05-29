@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import Recorder from "./Helper/index.js";
 import { CometChatAudioBubble } from "../CometChatAudioBubble/CometChatAudioBubble";
 import {  currentAudioPlayer, currentMediaPlayer, getThemeVariable } from "../../../utils/util";
@@ -8,13 +8,19 @@ interface MediaRecorderProps {
     autoRecording?: boolean;
     onCloseRecording?: () => void;
     onSubmitRecording?: (file: Blob) => void;
+    inline?: boolean;
 }
 
-const CometChatMediaRecorder: React.FC<MediaRecorderProps> = ({
+export interface CometChatMediaRecorderHandle {
+    submit: () => void;
+}
+
+const CometChatMediaRecorder = forwardRef<CometChatMediaRecorderHandle, MediaRecorderProps>(({
     autoRecording = false,
     onCloseRecording,
     onSubmitRecording,
-}) => {
+    inline = false,
+}, ref) => {
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | Recorder>();
     const [isRecording, setIsRecording] = useState(false);
     const [mediaPreviewUrl, setMediaPreviewUrl] = useState<string>();
@@ -36,6 +42,25 @@ const CometChatMediaRecorder: React.FC<MediaRecorderProps> = ({
     const permissionRequestPending = useRef<boolean>(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const previousFocusRef = useRef<HTMLElement | null>(null);
+    const autoSubmitAfterStop = useRef<boolean>(false);
+    const inlineAudioRef = useRef<HTMLAudioElement | null>(null);
+    const [isPlayingPreview, setIsPlayingPreview] = useState(false);
+    const [playbackTime, setPlaybackTime] = useState(0);
+    const playbackIntervalRef = useRef<number | undefined>(undefined);
+    const previousSegmentsRef = useRef<Blob[]>([]);
+
+    useImperativeHandle(ref, () => ({
+        submit: () => {
+            if (blobRef.current) {
+                onSubmitRecording?.(blobRef.current);
+                reset();
+            } else if (isRecording || isPaused) {
+                autoSubmitAfterStop.current = true;
+                createMedia.current = true;
+                handleStopRecording();
+            }
+        }
+    }));
 
     const stopStreamTracks = (stream?: MediaStream | null) => {
         if (!stream) return;
@@ -146,13 +171,21 @@ const CometChatMediaRecorder: React.FC<MediaRecorderProps> = ({
             };
             audioRecorder.onstop = () => {
                 if (createMedia.current && audioChunks.current.length > 0) {
-                    const recordedBlob = new Blob(audioChunks.current, {
+                    const allChunks = [...previousSegmentsRef.current, ...audioChunks.current];
+                    const recordedBlob = new Blob(allChunks, {
                         type: audioChunks.current[0]?.type || 'audio/webm',
                     });
                     blobRef.current = recordedBlob;
-                    const url = URL.createObjectURL(recordedBlob);
-                    setMediaPreviewUrl(url);
+                    if (autoSubmitAfterStop.current) {
+                        autoSubmitAfterStop.current = false;
+                        onSubmitRecording?.(recordedBlob);
+                        reset();
+                    } else {
+                        const url = URL.createObjectURL(recordedBlob);
+                        setMediaPreviewUrl(url);
+                    }
                     audioChunks.current = [];
+                    previousSegmentsRef.current = [];
                 }
             };
                         
@@ -267,12 +300,36 @@ const CometChatMediaRecorder: React.FC<MediaRecorderProps> = ({
             }
         }
     };
+
+    const handleResumeRecording = async () => {
+        if (permissionRequestPending.current) return;
+        pauseActiveMedia();
+        counterRunning.current = true;
+        createMedia.current = true;
+        hasInitializedRef.current = false;
+        permissionRequestPending.current = true;
+        try {
+            const recorder = await initMediaRecorder();
+            if (recorder) {
+                currentMediaPlayer.mediaRecorder = recorder;
+                startTimer();
+                setIsRecording(true);
+                setHasError(false);
+            } else {
+                setIsRecording(false);
+                createMedia.current = false;
+            }
+        } finally {
+            permissionRequestPending.current = false;
+        }
+    };
+
     const handleStopRecording = () => {
         setIsPaused(false);
         pauseActiveMedia();
         (mediaRecorder as MediaRecorder)?.stop();
         setIsRecording(false);
-        stopTimer();
+        clearInterval(timerIntervalRef.current);
         clearStream();
         stopStreamTracks(permissionProbeStreamRef.current);
         permissionProbeStreamRef.current = null;
@@ -307,6 +364,7 @@ const CometChatMediaRecorder: React.FC<MediaRecorderProps> = ({
         clearStream();
         audioChunks.current = [];
         blobRef.current = undefined;
+        previousSegmentsRef.current = [];
         permissionRequestPending.current = false;
     };
 
@@ -399,8 +457,10 @@ const CometChatMediaRecorder: React.FC<MediaRecorderProps> = ({
         }
     }, [permissionState, hasError, mediaPreviewUrl, isRecording, autoRecording]);
 
-    // Store previous focus and auto-focus first interactive element on mount
+    // Store previous focus and auto-focus first interactive element on mount (only for non-inline/modal mode)
     useEffect(() => {
+        if (inline) return;
+
         previousFocusRef.current = document.activeElement as HTMLElement;
         
         // Focus first interactive element
@@ -418,8 +478,10 @@ const CometChatMediaRecorder: React.FC<MediaRecorderProps> = ({
         };
     }, []);
 
-    // Focus trap: keep focus inside the recorder and handle Escape
+    // Focus trap: keep focus inside the recorder and handle Escape (only for non-inline/modal mode)
     useEffect(() => {
+        if (inline) return;
+
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
                 e.preventDefault();
@@ -459,6 +521,158 @@ const CometChatMediaRecorder: React.FC<MediaRecorderProps> = ({
         document.addEventListener('keydown', handleKeyDown);
         return () => document.removeEventListener('keydown', handleKeyDown);
     }, []);
+
+    const handlePlayPreview = () => {
+        if (!mediaPreviewUrl) return;
+        if (isPlayingPreview && inlineAudioRef.current) {
+            inlineAudioRef.current.pause();
+            clearInterval(playbackIntervalRef.current);
+            setIsPlayingPreview(false);
+            return;
+        }
+        if (!inlineAudioRef.current) {
+            inlineAudioRef.current = new Audio(mediaPreviewUrl);
+            inlineAudioRef.current.onended = () => {
+                clearInterval(playbackIntervalRef.current);
+                setIsPlayingPreview(false);
+                setPlaybackTime(0);
+            };
+        }
+        setPlaybackTime(0);
+        inlineAudioRef.current.play();
+        setIsPlayingPreview(true);
+        clearInterval(playbackIntervalRef.current);
+        const startTime = Date.now();
+        playbackIntervalRef.current = window.setInterval(() => {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            setPlaybackTime(elapsed);
+        }, 200);
+    };
+
+    // Cleanup audio on unmount or URL change
+    useEffect(() => {
+        return () => {
+            if (inlineAudioRef.current) {
+                inlineAudioRef.current.pause();
+                inlineAudioRef.current = null;
+            }
+            clearInterval(playbackIntervalRef.current);
+        };
+    }, [mediaPreviewUrl]);
+
+    if (inline) {
+        return (
+            <div
+                className="cometchat-media-recorder-inline"
+                ref={containerRef}
+                role="group"
+                aria-label={getLocalizedString("media_recorder_title") || "Audio recorder"}
+            >
+                {hasError ? (
+                    <div className="cometchat-media-recorder-inline__error">
+                        <div className="cometchat-media-recorder-inline__error-icon" />
+                        <span className="cometchat-media-recorder-inline__error-text">
+                            {getLocalizedString("media_recorder_error_title")}
+                        </span>
+                    </div>
+                ) : (
+                    <>
+                        <div
+                            className="cometchat-media-recorder-inline__delete"
+                            onClick={handleCloseRecording}
+                            role="button"
+                            tabIndex={0}
+                            aria-label="Delete recording"
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    handleCloseRecording();
+                                }
+                            }}
+                        >
+                            <div className="cometchat-media-recorder-inline__delete-icon" />
+                        </div>
+
+                        {isRecording && !isPaused ? (
+                            <>
+                                <div className="cometchat-media-recorder-inline__recording-dot" />
+                                <div className="cometchat-media-recorder-inline__timer">
+                                    {formatTime(counter)}
+                                </div>
+                                <div
+                                    className="cometchat-media-recorder-inline__pause"
+                                    onClick={handleStopRecording}
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-label="Stop recording"
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            handleStopRecording();
+                                        }
+                                    }}
+                                >
+                                    <div className="cometchat-media-recorder-inline__pause-icon" />
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div
+                                    className="cometchat-media-recorder-inline__play"
+                                    onClick={handlePlayPreview}
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-label={isPlayingPreview ? "Pause playback" : "Play recording"}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            handlePlayPreview();
+                                        }
+                                    }}
+                                >
+                                    <div className={`cometchat-media-recorder-inline__play-icon ${isPlayingPreview ? "cometchat-media-recorder-inline__play-icon--playing" : ""}`} />
+                                </div>
+                                <div className="cometchat-media-recorder-inline__timer">
+                                    {isPlayingPreview ? `${formatTime(playbackTime)}/${formatTime(counter)}` : formatTime(counter)}
+                                </div>
+                                <div
+                                    className="cometchat-media-recorder-inline__mic"
+                                    onClick={() => {
+                                        if (blobRef.current) {
+                                            previousSegmentsRef.current.push(blobRef.current);
+                                            blobRef.current = undefined;
+                                            setMediaPreviewUrl(undefined);
+                                            handleResumeRecording();
+                                        } else {
+                                            reset(); handleStartRecording();
+                                        }
+                                    }}
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-label={blobRef.current ? "Resume recording" : "Record new"}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            if (blobRef.current) {
+                                                previousSegmentsRef.current.push(blobRef.current);
+                                                blobRef.current = undefined;
+                                                setMediaPreviewUrl(undefined);
+                                                handleResumeRecording();
+                                            } else {
+                                                reset(); handleStartRecording();
+                                            }
+                                        }
+                                    }}
+                                >
+                                    <div className="cometchat-media-recorder-inline__mic-icon" />
+                                </div>
+                            </>
+                        )}
+                    </>
+                )}
+            </div>
+        );
+    }
 
     return (
         <div
@@ -679,6 +893,6 @@ const CometChatMediaRecorder: React.FC<MediaRecorderProps> = ({
             </div>
         </div>
     );
-};
+});
 
 export { CometChatMediaRecorder };
