@@ -28,7 +28,7 @@ const CometChatVideoBubble = (props: VideoBubbleProps) => {
 
     } = props;
 
-    const { posterImage, updateImage } = useCometChatVideoBubble({ src });
+    const { posterImage, videoSrc, updateImage } = useCometChatVideoBubble({ src });
     const videoRef = useRef<HTMLVideoElement | null>(null);
 
     /**
@@ -100,8 +100,8 @@ const CometChatVideoBubble = (props: VideoBubbleProps) => {
                     poster={posterImage}
                     aria-label="Video message"
                     preload="metadata"
+                    src={videoSrc || src}
                 >
-                    <source src={src} />
                     <track kind="captions" label="Captions" default />
                     Your browser does not support the video tag.
                 </video>
