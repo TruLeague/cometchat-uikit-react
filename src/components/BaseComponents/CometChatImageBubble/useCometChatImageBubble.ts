@@ -54,7 +54,13 @@ export const useCometChatImageBubble = ({
                     // Keep placeholder if conversion failed — browsers cannot render raw HEIC.
                     setImage(converted ?? placeholderImage);
                 } else {
-                    setImage(src);
+                    // Use blob URL so <img> doesn't need another network request
+                    const blob = response as Blob;
+                    if (blob && blob.size > 0) {
+                        setImage(URL.createObjectURL(blob));
+                    } else {
+                        setImage(src);
+                    }
                 }
             })
             .catch((error) => {

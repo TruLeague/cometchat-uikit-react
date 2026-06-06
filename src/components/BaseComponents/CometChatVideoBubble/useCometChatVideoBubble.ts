@@ -4,6 +4,7 @@ export const useCometChatVideoBubble = ({
     src = "",
 }) => {
     const [posterImage, setPosterImage] = useState("");
+    const [videoSrc, setVideoSrc] = useState("");
 
     /* 
         The purpose of this function is to update the poster image displayed on the video. 
@@ -23,10 +24,29 @@ export const useCometChatVideoBubble = ({
         } catch (error) {
             console.error(error);
         }
+
+        // Download video as blob so <video> doesn't need a separate network request
+        if (src) {
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", src, true);
+            xhr.responseType = "blob";
+            xhr.onload = () => {
+                if (xhr.status === 200 && xhr.response) {
+                    setVideoSrc(URL.createObjectURL(xhr.response));
+                } else {
+                    setVideoSrc(src);
+                }
+            };
+            xhr.onerror = () => {
+                setVideoSrc(src);
+            };
+            xhr.send();
+        }
     }
 
     return {
         posterImage,
+        videoSrc,
         updateImage,
     }
 }
