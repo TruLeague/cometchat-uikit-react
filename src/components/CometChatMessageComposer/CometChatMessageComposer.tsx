@@ -590,7 +590,7 @@ const isPartOfCurrentChatForUIEvent: (message: CometChat.BaseMessage) => boolean
   const userPropRef = useRefSync(user);
   const groupPropRef = useRefSync(group);
   const parentMessageIdPropRef = useRefSync(parentMessageId);
-  const messageToReplyRef = useRefSync<CometChat.BaseMessage| null>(initialMessageToReply);
+  const messageToReplyRef = useRefSync<CometChat.BaseMessage | null>(state.messageToReply);
   const onSendButtonClickPropRef = useRefSync(onSendButtonClick);
   const onSendButtonClickExtendedPropRef = useRefSync(onSendButtonClickExtended);
   const [smartRepliesView, setSmartRepliesView] = React.useState<React.ReactNode | null>(null);
@@ -2297,6 +2297,7 @@ try {
         status:MessageStatus.cancelled
       })
     }
+    messageToReplyRef.current = null;
     dispatch({
       type: "setMessageToReply",
       messageToReply: null,
