@@ -76,6 +76,62 @@ type PendingAttachmentState = {
 
 const UPLOADING_STATUS_TEXT = "Uploading...";
 
+/**
+ * Image formats that browsers can render reliably across supported clients.
+ * Any non-HEIC image outside this allowlist is sent as a downloadable CometChat
+ * file message instead of being passed to the inline image renderer.
+ */
+const PREVIEWABLE_IMAGE_EXTENSIONS = new Set([
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "webp",
+  "bmp",
+  "ico",
+  "jfif",
+  "pjpeg",
+  "pjp",
+  "avif",
+  "apng",
+  "svg",
+]);
+
+const PREVIEWABLE_IMAGE_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/bmp",
+  "image/x-ms-bmp",
+  "image/vnd.microsoft.icon",
+  "image/x-icon",
+  "image/avif",
+  "image/apng",
+  "image/svg+xml",
+]);
+
+const IMAGE_ATTACHMENT_ACCEPT = "image/*,.heic,.heif";
+
+function isPreviewableImage(file: File): boolean {
+  const normalizedName = file.name.trim().toLowerCase();
+  const extensionSeparator = normalizedName.lastIndexOf(".");
+  const extension =
+    extensionSeparator > 0 && extensionSeparator < normalizedName.length - 1
+      ? normalizedName.slice(extensionSeparator + 1)
+      : "";
+  const mimeType = file.type.trim().toLowerCase();
+
+  if (extension && !PREVIEWABLE_IMAGE_EXTENSIONS.has(extension)) {
+    return false;
+  }
+
+  return (
+    PREVIEWABLE_IMAGE_MIME_TYPES.has(mimeType) ||
+    (!mimeType && PREVIEWABLE_IMAGE_EXTENSIONS.has(extension))
+  );
+}
+
 interface MessageComposerProps {
   /**
    * The initial text pre-filled in the message input when the component mounts.
@@ -1529,12 +1585,22 @@ try {
       // Treat HEIC/HEIF as image even when the browser reports empty MIME type
       // (Chrome/Edge on Windows). The file will be converted to JPEG in processFile.
       const isHeic = isHeicFile(file);
+      const previewableImage =
+        expectedFileType === "image" && isPreviewableImage(file);
+      const sendImageAsFile =
+        expectedFileType === "image" && !isHeic && !previewableImage;
       const actualFileType =
         expectedFileType === "file"
           ? "file"
-          : (isHeic ? "image" : file.type.split("/")[0]);
+          : expectedFileType === "image"
+            ? (sendImageAsFile ? "file" : "image")
+            : file.type.split("/")[0];
 
-      if (expectedFileType !== "file" && expectedFileType !== actualFileType) {
+      if (
+        expectedFileType !== "file" &&
+        expectedFileType !== actualFileType &&
+        !sendImageAsFile
+      ) {
         dispatch({ type: "setShowValidationError", showValidationError: true });
         mediaFilePickerElement.value = "";
         return;
@@ -1551,7 +1617,7 @@ try {
           console.warn("[CometChatMessageComposer] HEIC preview conversion failed:", err);
           // objectUrl stays undefined – UI will show a file-style preview instead of broken image
         }
-      } else if (file.type?.startsWith("image/") || file.type?.startsWith("video/")) {
+      } else if (actualFileType === "image" || actualFileType === "video") {
         objectUrl = URL.createObjectURL(file);
       }
 
@@ -2342,7 +2408,7 @@ try {
       } else {
         // Open the correct file picker
         const acceptMap: Record<string, string> = {
-          [CometChatUIKitConstants.MessageTypes.image]: "image/*,.heic,.heif",
+          [CometChatUIKitConstants.MessageTypes.image]: IMAGE_ATTACHMENT_ACCEPT,
           [CometChatUIKitConstants.MessageTypes.video]: "video/*",
           [CometChatUIKitConstants.MessageTypes.audio]: "audio/*",
           [CometChatUIKitConstants.MessageTypes.file]: "*/*"
@@ -2419,7 +2485,10 @@ try {
         : fallbackName;
 
     const statusText = isSendingPendingAttachment ? UPLOADING_STATUS_TEXT : undefined;
-    if (pendingAttachment.objectUrl && (pendingAttachment.file.type?.startsWith("image/") || isHeicFile(pendingAttachment.file))) {
+    if (
+      pendingAttachment.objectUrl &&
+      pendingAttachment.fileType === CometChatUIKitConstants.MessageTypes.image
+    ) {
       return (
         <CometChatClipboardImagePreview
           imageUrl={pendingAttachment.objectUrl}
