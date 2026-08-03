@@ -310,6 +310,23 @@
     display: none;
 }
 
+.cometchat-message-composer__mention-all-icon {
+    display: flex;
+    width: 48px;
+    height: 48px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: var(--cometchat-radius-max, 1000px);
+    background: var(--cometchat-primary-color, #6852d6);
+    color: var(--cometchat-static-white, #fff);
+    font: var(--cometchat-font-heading3-bold, 700 20px Roboto);
+}
+
+.cometchat-special-mentions-list .cometchat-list-item {
+    cursor: pointer;
+}
+
 .cometchat-message-composer__input-wrapper {
     position: relative;
     width: calc(100% - 72px);

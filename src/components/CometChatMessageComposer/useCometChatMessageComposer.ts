@@ -164,7 +164,16 @@ export function useCometChatMessageComposer(args: Args) {
                     if (textFormatterArray && textFormatterArray.length) {
                       for (let i = 0; i < textFormatterArray.length; i++) {
                         if (textFormatterArray[i] instanceof CometChatMentionsFormatter) {
-                          (textFormatterArray[i] as CometChatMentionsFormatter).setCometChatUserGroupMembers(object.message.getMentionedUsers())
+                          const mentionsFormatter = textFormatterArray[i] as CometChatMentionsFormatter;
+                          mentionsFormatter.setCometChatUserGroupMembers(
+                            object.message.getMentionedUsers()
+                          );
+                          const channelMatches = Array.from(
+                            object.message.getText().matchAll(/<@all:(.*?)>/g)
+                          );
+                          mentionsFormatter.setCometChatMentionedChannels(
+                            channelMatches.map((match) => match[1])
+                          );
                         }
 
                         const element = getCurrentInput() as HTMLElement;
@@ -571,4 +580,3 @@ export function useCometChatMessageComposer(args: Args) {
     }
   }, [user, group, disableMentions]);
 }
-

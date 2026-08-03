@@ -292,6 +292,12 @@ interface MessageComposerProps {
  * @defaultValue ""
  */
   placeholderText?: string;
+
+  /** Controls whether the group-wide @all mention is available. */
+  disableMentionAll?: boolean;
+
+  /** Label used for the group-wide mention. */
+  mentionAllLabel?: string;
 }
 
 /**
@@ -465,7 +471,9 @@ export function CometChatMessageComposer(props: MessageComposerProps) {
     disableSoundForMessage = false,
     customSoundForMessage,
     showScrollbar = false,
-    placeholderText = getLocalizedString('message_composer_placeholder')
+    placeholderText = getLocalizedString('message_composer_placeholder'),
+    disableMentionAll = false,
+    mentionAllLabel = "all"
   } = props;
   
   /**
@@ -676,14 +684,20 @@ const isPartOfCurrentChatForUIEvent: (message: CometChat.BaseMessage) => boolean
    */
 
   const defaultMentionsItemClickHandler = (
-    user: CometChat.User | CometChat.GroupMember
+    user: CometChat.User | CometChat.GroupMember | null
   ) => {
   try {
-    let cometChatUsers = [user];
-    mentionsTextFormatterInstanceRef.current.setCometChatUserGroupMembers(
-      cometChatUsers
-    );
-    reRenderMentions()
+    if (user) {
+      mentionsTextFormatterInstanceRef.current.setCometChatUserGroupMembers([user]);
+      reRenderMentionsWithEntity(user);
+    } else if (mentionAllLabel) {
+      mentionsTextFormatterInstanceRef.current.setCometChatMentionedChannels([
+        mentionAllLabel,
+      ]);
+      reRenderMentionsWithEntity(mentionAllLabel);
+    } else {
+      return;
+    }
     setShowListForMentions(false);
     setMentionsSearchCount(1);
     setMentionsSearchTerm("");
@@ -776,7 +790,9 @@ try {
    * - It ensures the correct caret position and range for mentions, retrieves formatted text,
    *   and dispatches the input changes for further processing.
    */
-  const reRenderMentions = useCallback(() => {
+  const reRenderMentionsWithEntity = useCallback((
+    entity: CometChat.User | CometChat.GroupMember | string
+  ) => {
    try {
     const contentEditable: any = getCurrentInput();
     if (textFormatterArray && textFormatterArray.length) {
@@ -798,11 +814,10 @@ try {
             currentSelectionForRegex.current!,
             currentSelectionForRegexRange.current!
           );
-          textFormatterArray[i].getFormattedText(
-            null,
-            { mentionsTargetElement: MentionsTargetElement.textinput }
-
-          );
+          const formatter = textFormatterArray[i];
+          if (formatter instanceof CometChatMentionsFormatter) {
+            formatter.getFormattedTextForEntity(entity);
+          }
         }
       }
 
@@ -2580,10 +2595,13 @@ try {
   function getTextMessageEditPreview(): JSX.Element | null {
     const checkForMentions = (message: CometChat.TextMessage) => {
       const regex = /<@uid:(.*?)>/g;
+      const channelRegex = /<@all:(.*?)>/g;
       let messageText = message.getText();
       let messageTextTmp = messageText;
       let match = regex.exec(messageText);
+      let channelMatch = channelRegex.exec(messageText);
       let cometChatUsersGroupMembers = [];
+      const cometChatMentionedChannels: string[] = [];
       let mentionedUsers = message.getMentionedUsers();
       while (match !== null) {
         let user;
@@ -2601,8 +2619,19 @@ try {
         }
         match = regex.exec(messageText);
       }
+      while (channelMatch !== null) {
+        messageTextTmp = messageTextTmp.replace(
+          channelMatch[0],
+          "@" + channelMatch[1]
+        );
+        cometChatMentionedChannels.push(channelMatch[1]);
+        channelMatch = channelRegex.exec(messageText);
+      }
       mentionsTextFormatterInstanceRef.current.setCometChatUserGroupMembers(
         cometChatUsersGroupMembers
+      );
+      mentionsTextFormatterInstanceRef.current.setCometChatMentionedChannels(
+        cometChatMentionedChannels
       );
       mentionsTextFormatterInstanceRef.current.setLoggedInUser(
         CometChatUIKitLoginListener.getLoggedInUser()!
@@ -3166,6 +3195,8 @@ try {
               groupMemberRequestBuilder={groupMembersRequestBuilder}
               onError={defaultOnEmptyForMentions}
               showScrollbar={showScrollbar}
+              disableMentionAll={disableMentionAll}
+              mentionAllLabel={mentionAllLabel}
             />
           </div>
         )}
