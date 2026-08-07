@@ -412,6 +412,8 @@ interface SearchProps {
   SideActions : any;
   userTags ?: any;
   panelType ?: string;
+  /** Effective role for delegated/on-behalf sessions. */
+  actingRole?: string;
 }
 
 /**
@@ -454,7 +456,8 @@ export function CometChatSearch(props: SearchProps) {
     conversationType,
     SideActions,
     userTags,
-    panelType
+    panelType,
+    actingRole
   } = props;
 
 
@@ -637,7 +640,8 @@ export function CometChatSearch(props: SearchProps) {
     guid,
     conversationType,
     userTags,
-    panelType
+    panelType,
+    actingRole
   });
   const shouldRenderConversations = useCallback(() => {
     // If searchIn is empty, search in both conversations and messages
