@@ -302,6 +302,10 @@
     max-height: 336px;
 }
 
+.cometchat-mention-list .cometchat-group-members--loading-more .cometchat-list__body {
+    padding-bottom: 48px;
+}
+
 .cometchat-mention-list>.cometchat {
     overflow: hidden;
     border-radius: inherit;
