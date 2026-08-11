@@ -52,6 +52,7 @@ import { PanelTypeContext } from "../../context/PanelTypeContext";
 import { startStreamingMessage, streamingState$ } from "../../services/stream-message.service";
 import { sendMessageToMobileApp } from "../../utils/MobileBridge";
 import { resolveDisplayName } from "../../utils/nameTransformer";
+import { useMessageReceipts } from "./useMessageReceipts";
 
 
 /**
@@ -163,6 +164,14 @@ interface MessageListProps {
    * @default false
    */
   hideReceipts?: boolean;
+
+  /**
+   * Prevents this message list from sending read or delivery receipts.
+   * Useful for read-only observer experiences where the authenticated user
+   * must not appear to have received or read the conversation.
+   * @default false
+   */
+  suppressMessageReceipts?: boolean;
 
   /**
    * Hides the default & custom error view passed in `errorView` prop.
@@ -430,6 +439,7 @@ const defaultProps: MessageListProps = {
   errorView: undefined,
   loadingView: undefined,
   hideReceipts: false,
+  suppressMessageReceipts: false,
   hideModerationView: false,
   messageAlignment: MessageListAlignment.standard,
   hideDateSeparator: false,
@@ -480,6 +490,7 @@ const CometChatMessageList = (props: MessageListProps) => {
     errorView,
     loadingView,
     hideReceipts,
+    suppressMessageReceipts,
     hideModerationView,
     messageAlignment,
     hideDateSeparator,
@@ -1994,24 +2005,13 @@ const CometChatMessageList = (props: MessageListProps) => {
     [messagesTypesMap, errorHandler]
   );
 
-  /**
-     * Function to mark a given message as read.
-     * @param {CometChat.BaseMessage} message - The message to be marked as read.
-     * @returns {void}
-     */
-  const markMessageRead: (message: CometChat.BaseMessage) => void = useCallback((message: CometChat.BaseMessage) => {
-    CometChat.markAsRead(message).then(
-      () => {
-        CometChatMessageEvents.ccMessageRead.next(message);
-      },
-      (error: unknown) => {
-        errorHandler(error, "markAsRead");
-      }
-    );
-  }, [errorHandler])
+  const { markMessageRead, markMessageDelivered } = useMessageReceipts({
+    suppressed: suppressMessageReceipts ?? false,
+    onError: errorHandler
+  });
 
   /**
-     * Function to check and mark a message as read if `hideReceipts` is false and the message is not sent by the logged-in user.
+     * Function to mark an incoming message as read when receipts are enabled.
      * @param {CometChat.BaseMessage} message - The message to be checked and marked as read.
      * @returns {void}
      */
@@ -2020,7 +2020,7 @@ const CometChatMessageList = (props: MessageListProps) => {
       try {
         if (
           message.getSender().getUid() !== loggedInUserRef.current?.getUid()) {
-          markMessageRead(message);
+          void markMessageRead(message);
         }
       } catch (error) {
         errorHandler(error, "checkAndMarkMessageAsRead")
@@ -2127,8 +2127,7 @@ const CometChatMessageList = (props: MessageListProps) => {
               .fetchPrevious()
               .then((messagesList: CometChat.BaseMessage[]) => {
                 if (messagesList[0]) {
-                  CometChat.markAsRead(messagesList[0]).then(() => {
-                    CometChatMessageEvents.ccMessageRead.next(messagesList[0]);
+                  void markMessageRead(messagesList[0]).finally(() => {
                     setQuotedMessageId('')
                   })
                 }
@@ -2149,8 +2148,7 @@ const CometChatMessageList = (props: MessageListProps) => {
               .fetchPrevious()
               .then((messagesList: CometChat.BaseMessage[]) => {
                 if (messagesList[0]) {
-                  CometChat.markAsRead(messagesList[0]).then(() => {
-                    CometChatMessageEvents.ccMessageRead.next(messagesList[0]);
+                  void markMessageRead(messagesList[0]).finally(() => {
                     setQuotedMessageId('')
                   })
                 }
@@ -2273,8 +2271,8 @@ const CometChatMessageList = (props: MessageListProps) => {
                   messagesList[messagesList.length - 1];
                 let isMyMessage = lastMessage?.getSender().getUid() == loggedInUserRef.current?.getUid()
                 if (!lastMessage.getDeliveredAt() && !isMyMessage) {
-                  CometChat.markAsDelivered(lastMessage).then(() => {
-                    if (lastMessage.getReceiverType() == CometChatUIKitConstants.MessageReceiverType.user && !hideReceipts) {
+                  void markMessageDelivered(lastMessage).then((wasMarked) => {
+                    if (wasMarked && lastMessage.getReceiverType() == CometChatUIKitConstants.MessageReceiverType.user && !hideReceipts) {
                       messagesList.forEach((m: CometChat.BaseMessage) => {
                         if (
                           m?.getId() <= lastMessage?.getId() &&
@@ -2294,8 +2292,8 @@ const CometChatMessageList = (props: MessageListProps) => {
                       lastMessage.getCategory() === CometChat.MessageCategory.CALL ||
                       lastMessage.getCategory() === CometChat.MessageCategory.ACTION))
                 ) {
-                  CometChat.markAsRead(lastMessage).then(() => {
-                    if (!hideReceipts && lastMessage.getReceiverType() == CometChatUIKitConstants.MessageReceiverType.user) {
+                  void markMessageRead(lastMessage).then((wasMarked) => {
+                    if (wasMarked && !hideReceipts && lastMessage.getReceiverType() == CometChatUIKitConstants.MessageReceiverType.user) {
                       messagesList.forEach((m: CometChat.BaseMessage) => {
                         if (
                           m?.getId() <= lastMessage?.getId() &&
@@ -2378,7 +2376,9 @@ const CometChatMessageList = (props: MessageListProps) => {
     goToMessageId,
     messageRepliedTo,
     hasCompletedInitialLoad,
-    quotedMessageId
+    quotedMessageId,
+    markMessageRead,
+    markMessageDelivered
   ]);
 
   /**
@@ -2498,9 +2498,10 @@ const CometChatMessageList = (props: MessageListProps) => {
                 lastMessage.getSender().getUid() != loggedInUserRef.current?.getUid() &&
                 !lastMessage.getReadAt()
               ) {
-                CometChat.markAsRead(lastMessage).then(() => {
-                  UnreadMessagesRef.current = [];
-                  CometChatMessageEvents.ccMessageRead.next(lastMessage);
+                void markMessageRead(lastMessage).then((wasMarked) => {
+                  if (wasMarked) {
+                    UnreadMessagesRef.current = [];
+                  }
                 });
               }
             } else {
@@ -2528,7 +2529,8 @@ const CometChatMessageList = (props: MessageListProps) => {
       isOnBottomRef,
       shouldScrollToMessage,
       goToMessageId,
-      messageRepliedTo
+      messageRepliedTo,
+      markMessageRead
     ]
   );
 
@@ -3009,7 +3011,7 @@ const CometChatMessageList = (props: MessageListProps) => {
         } else {
           if (
             message.getSender().getUid() !== loggedInUserRef.current?.getUid()) {
-            CometChat.markAsDelivered(message)
+            void markMessageDelivered(message)
           }
         }
       } catch (error) {
@@ -3027,6 +3029,7 @@ const CometChatMessageList = (props: MessageListProps) => {
       updateReplyCount,
       updateUnreadReplyCount,
       playAudio,
+      markMessageDelivered,
       errorHandler,
     ]
   );
