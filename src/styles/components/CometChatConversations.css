@@ -457,8 +457,9 @@ background: var(--cometchat-icon-color-secondary, #A1A1A1);
   font-style: normal;
 }
 
-.cometchat-conversations .cometchat-confirm-dialog {
-  width: 320px;
+.cometchat-conversations__trailing-view-options-delete-backdrop .cometchat-confirm-dialog {
+  width: calc(100% - 40px);
+  max-width: 300px;
 }
 
 .cometchat-conversations__empty-state-view,
