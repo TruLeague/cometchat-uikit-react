@@ -151,6 +151,7 @@ interface UseCometChatSearchMessagesListProps {
 
   userTags?: any;
   panelType?: string;
+  actingRole?: string;
 }
 
 
@@ -245,7 +246,8 @@ export function useCometChatSearchMessagesList(props: UseCometChatSearchMessages
     loggedInUser,
     conversationType,
     userTags,
-    panelType
+    panelType,
+    actingRole
   } = props;
 
   // Initialize state
@@ -839,7 +841,8 @@ const getMessageTitle = useCallback((message: CometChat.BaseMessage): string => 
     }
 
     let role = userTags[0] == 'prospect' ? 'prospect' : userTags[0] == 'ambassadors' ? 'ambassador' : userTags[0] == "college_admin" ? "staff" : "support";
-    let myRole = panelType === "admin" ? "staff" : panelType === "prospect" ? "prospect" : panelType === "ambassador" ? "ambassador" : "support";
+    let myRole = actingRole?.toLowerCase() ||
+      (panelType === "admin" ? "staff" : panelType === "prospect" ? "prospect" : panelType === "ambassador" ? "ambassador" : "support");
     let filteredMessageList = messageState.messageList.filter((message) => message.getReceiverType() == conversationType);
     filteredMessageList = filteredMessageList.filter((message : any) => (message.receiver.role == role && message.sender.role == myRole) || (message.receiver.role == myRole && message.sender.role == role));
     
