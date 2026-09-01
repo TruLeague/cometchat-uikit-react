@@ -38,7 +38,15 @@ import { CometChatGroupEvents } from "../../events/CometChatGroupEvents";
 import { getThemeMode } from "../../utils/util";
 import { resolveDisplayName } from "../../utils/nameTransformer";
 
+const FIRST_ITEM = new CometChat.GroupMember(
+  "__cometchat_first_item__",
+  CometChatUIKitConstants.groupMemberScope.participant
+);
+
 interface GroupMembersProps {
+  /** A custom first item rendered inside the scrollable member list. */
+  firstItemView?: JSX.Element;
+
   /**
    * Hides the default search bar.
    *
@@ -415,6 +423,7 @@ function stateReducer(state: State, action: Action): State {
 export function CometChatGroupMembers(props: GroupMembersProps) {
   const {
     headerView,
+    firstItemView,
     hideSearch = false,
     groupMemberRequestBuilder = null,
     searchRequestBuilder = null,
@@ -1197,11 +1206,14 @@ export function CometChatGroupMembers(props: GroupMembersProps) {
 
   // Determine which list to pass to CometChatList
   const displayList = roleFilteredList ?? state.groupMemberList;
+  const displayedMembers = firstItemView
+    ? [FIRST_ITEM, ...displayList]
+    : displayList;
 
   return (
     <div className="cometchat" style={{ width: "100%", height: "100%" }}>
       <div
-        className={`cometchat-group-members ${!showScrollbar ? 'cometchat-group-members-hide-scrollbar' : ''}`}
+        className={`cometchat-group-members ${!showScrollbar ? 'cometchat-group-members-hide-scrollbar' : ''} ${isFetchingMore && hasMoreMembers ? 'cometchat-group-members--loading-more' : ''}`}
         role="region"
         aria-label={getLocalizedString("group_members") || "Group members"}
       >
@@ -1248,9 +1260,9 @@ export function CometChatGroupMembers(props: GroupMembersProps) {
             searchText={state.searchText}
             onSearch={onSearchTextChange}
             hideSearch={hideSearch}
-            list={displayList}
+            list={displayedMembers}
             listItemKey='getUid'
-            itemView={getListItem()}
+            itemView={(member) => member === FIRST_ITEM ? firstItemView! : getListItem()(member)}
             showSectionHeader={false}
             onScrolledToBottom={() =>
               fetchNextAndAppendGroupMembers(
@@ -1259,7 +1271,7 @@ export function CometChatGroupMembers(props: GroupMembersProps) {
                   true
               )
             }
-            state={state.fetchState === States.loaded && displayList.length === 0 ? States.empty : state.fetchState}
+            state={state.fetchState === States.loaded && displayedMembers.length === 0 ? States.empty : state.fetchState}
             loadingView={getLoadingView()}
             emptyView={getEmptyView()}
             errorView={getErrorView()}

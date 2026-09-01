@@ -1,7 +1,8 @@
 import { CometChatUsers } from '../CometChatUsers/CometChatUsers';
 import { CometChatGroupMembers } from '../CometChatGroupMembers/CometChatGroupMembers';
 import { UserMemberListType } from '../../Enums/Enums';
-import { JSX } from 'react';
+import { JSX, useCallback, useMemo } from 'react';
+import { CometChatListItem } from '../BaseComponents/CometChatListItem/CometChatListItem';
 export interface MentionsProps {
   /**
    * Determines the type of list to display - either users or group members.
@@ -14,7 +15,7 @@ export interface MentionsProps {
    * @param user - The clicked user (CometChat.User) or group member (CometChat.GroupMember)
    * @returns void
    */
-  onItemClick?: (user: CometChat.User | CometChat.GroupMember) => void;
+  onItemClick?: (user: CometChat.User | CometChat.GroupMember | null) => void;
 
   /**
    * A custom view to render each user or group member item in the list.
@@ -71,6 +72,12 @@ export interface MentionsProps {
    * @defaultValue `false`
    */
   showScrollbar?: boolean;
+
+  /** Disables the group-wide @all option. */
+  disableMentionAll?: boolean;
+
+  /** Label used for the group-wide mention. */
+  mentionAllLabel?: string;
 }
 
 export function CometChatUserMemberWrapper(props: MentionsProps) {
@@ -86,7 +93,32 @@ export function CometChatUserMemberWrapper(props: MentionsProps) {
     groupMemberRequestBuilder,
     onError,
     showScrollbar = false,
+    disableMentionAll = false,
+    mentionAllLabel = "all",
   } = props;
+
+  const shouldShowMentionAll = useMemo(() => {
+    if (
+      searchKeyword?.trim() &&
+      !mentionAllLabel
+        .toLowerCase()
+        .startsWith(searchKeyword.trim().toLowerCase())
+    ) {
+      return false;
+    }
+
+    return (
+      !disableMentionAll &&
+      userMemberListType === UserMemberListType.groupmembers &&
+      Boolean(group)
+    );
+  }, [disableMentionAll, group, mentionAllLabel, searchKeyword, userMemberListType]);
+
+  const handleOnEmpty = useCallback(() => {
+    if (!shouldShowMentionAll) {
+      onEmpty?.();
+    }
+  }, [onEmpty, shouldShowMentionAll]);
 
   return (
     <>
@@ -100,7 +132,7 @@ export function CometChatUserMemberWrapper(props: MentionsProps) {
           itemView={itemView}
           usersRequestBuilder={usersRequestBuilder}
           subtitleView={subtitleView}
-          onEmpty={onEmpty}
+          onEmpty={handleOnEmpty}
           onError={onError}
           disableLoadingState={true}
         />
@@ -116,7 +148,24 @@ export function CometChatUserMemberWrapper(props: MentionsProps) {
           searchKeyword={searchKeyword}
           itemView={itemView}
           subtitleView={subtitleView}
-          onEmpty={onEmpty}
+          onEmpty={handleOnEmpty}
+          firstItemView={shouldShowMentionAll ? (
+            <div className="cometchat-special-mentions-list">
+              <CometChatListItem
+                title={`@${mentionAllLabel}`}
+                subtitleView={<span>Notify everyone in this group</span>}
+                leadingView={(
+                  <div
+                    className="cometchat-message-composer__mention-all-icon"
+                    aria-hidden="true"
+                  >
+                    @
+                  </div>
+                )}
+                onListItemClicked={() => onItemClick?.(null)}
+              />
+            </div>
+          ) : undefined}
           trailingView={(entity: CometChat.GroupMember) => { return <></> }}
           onError={onError}
           disableLoadingState={true}
