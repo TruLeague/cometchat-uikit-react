@@ -154,6 +154,13 @@ interface MessageListProps {
   hideStickyDate?: boolean;
 
   /**
+   * Shows the date separator before the first loaded message and hides the
+   * sticky date header while the message list is scrolled to the top.
+   * @default false
+   */
+  showFirstMessageDateSeparator?: boolean;
+
+  /**
    * Hides the visibility of moderation status in the message list.
    * @default false
    */
@@ -469,6 +476,7 @@ const defaultProps: MessageListProps = {
   hideAvatar: false,
   hideGroupActionMessages: false,
   hideStickyDate: false,
+  showFirstMessageDateSeparator: false,
   quickOptionsCount: 2,
   showConversationStarters: false,
   showSmartReplies: false,
@@ -518,6 +526,7 @@ const CometChatMessageList = (props: MessageListProps) => {
     hideAvatar,
     hideGroupActionMessages,
     hideStickyDate,
+    showFirstMessageDateSeparator,
     quickOptionsCount,
     disableSoundForMessages,
     customSoundForMessages,
@@ -558,6 +567,7 @@ const CometChatMessageList = (props: MessageListProps) => {
   const [showHeaderPanelView, setShowHeaderPanelView] = useState<boolean>(false);
   const [dateHeader, setDateHeader] = useState<number>(0);
   const [showDateHeader, setShowDateHeader] = useState<boolean>(false);
+  const [isMessageListAtTop, setIsMessageListAtTop] = useState<boolean>(true);
   const [shouldScrollToMessage, setShouldScrollToMessage] = useState<boolean>(true);
   const [hasTargetMessageId, setHasTargetMessageId] = useState<boolean>(goToMessageId ? true : false);
   const [showScrollToBottom, setShowScrollToBottom] = useState<boolean>(false);
@@ -3871,6 +3881,7 @@ const CometChatMessageList = (props: MessageListProps) => {
       if (!messageListBody) return;
 
       const { scrollTop, scrollHeight, clientHeight } = messageListBody;
+      setIsMessageListAtTop(scrollTop <= 1);
       const isVisible = (scrollHeight - scrollTop - clientHeight) > 50;
 
       if (hasVisibleAreaRef.current !== isVisible) {
@@ -4326,8 +4337,15 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
  */
   const getMessageBubbleDateHeader: (item: CometChat.BaseMessage, i: number) => JSX.Element | null = useCallback(
     (item: CometChat.BaseMessage, i: number) => {
+      const shouldShowFirstMessageDate =
+        i === 0 && showFirstMessageDateSeparator;
+      const shouldShowDateTransition =
+        i !== 0 &&
+        isDateDifferent(messageList[i - 1]?.getSentAt(), item?.getSentAt());
+
       if (
-        i != 0 && isDateDifferent(messageList[i - 1]?.getSentAt(), item?.getSentAt()) && !hideDateSeparator
+        !hideDateSeparator &&
+        (shouldShowFirstMessageDate || shouldShowDateTransition)
       ) {
         return (
           <div
@@ -4352,7 +4370,8 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
     [
       messageList,
       isDateDifferent,
-      hideDateSeparator
+      hideDateSeparator,
+      showFirstMessageDateSeparator
     ]
   );
 
@@ -4734,7 +4753,7 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
         <div
           className={`cometchat-message-list ${messageListState != States.loading && hasCompletedInitialLoad && !isMessageRepliedToAvailable && messageListState != States.empty && !isAgentChat ? 'cometchat-message-list-loaded' : ""} ${!showScrollbar ? "cometchat-message-list-hide-scrollbar" : ""}`}
         >
-          {stickyDateHeaderRef.current && showDateHeader && !hideStickyDate && messageList.length > 0 ? <div
+          {stickyDateHeaderRef.current && showDateHeader && !hideStickyDate && (!showFirstMessageDateSeparator || !isMessageListAtTop) && messageList.length > 0 ? <div
             className='cometchat-message-list__date-header'
           >
             <CometChatDate
