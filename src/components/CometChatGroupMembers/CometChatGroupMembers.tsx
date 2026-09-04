@@ -4,6 +4,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useReducer,
   useRef,
   useState,
@@ -230,6 +231,23 @@ interface GroupMembersProps {
    * @defaultValue `false`
    */
     showScrollbar?: boolean;
+
+  /**
+   * Enables role-based tabs above the member list.
+   * Each tab groups members by their CometChat `role` field.
+   * Only tabs with at least one member are shown.
+   * If only one tab has members, no tabs are rendered.
+   *
+   * @example
+   * ```tsx
+   * roleTabs={[
+   *   { key: "staff", label: "Admin", roles: ["staff", "admin"] },
+   *   { key: "ambassador", label: "Ambassadors", roles: ["ambassador"] },
+   *   { key: "prospect", label: "Prospects", roles: ["prospect"] },
+   * ]}
+   * ```
+   */
+  roleTabs?: Array<{ key: string; label: string; roles: string[] }>;
 }
 
 type State = {
@@ -432,6 +450,7 @@ export function CometChatGroupMembers(props: GroupMembersProps) {
     titleView,
     leadingView,
     showScrollbar = false,
+    roleTabs,
   } = props;
 
   const [state, dispatch] = useReducer(stateReducer, {
@@ -450,6 +469,90 @@ export function CometChatGroupMembers(props: GroupMembersProps) {
   const groupPropRef = useRefSync(group);
   const errorHandler = useCometChatErrorHandler(onError);
   const groupMembersSearchText = useRef<string>("");
+
+  // ── Role tabs state ────────────────────────────────────────────────────
+  const [activeRoleTabKey, setActiveRoleTabKey] = useState<string | null>(null);
+  const roleTabListRef = useRef<HTMLDivElement>(null);
+
+  // Bucket members by role tab
+  const roleTabBuckets = useMemo(() => {
+    if (!roleTabs || roleTabs.length === 0) return null;
+    const buckets: Record<string, CometChat.GroupMember[]> = {};
+    for (const tab of roleTabs) {
+      buckets[tab.key] = [];
+    }
+    for (const member of state.groupMemberList) {
+      const memberRole = (member.getRole?.() ?? "").trim().toLowerCase();
+      for (const tab of roleTabs) {
+        if (tab.roles.some((r) => r.toLowerCase() === memberRole)) {
+          buckets[tab.key].push(member);
+          break;
+        }
+      }
+    }
+    return buckets;
+  }, [roleTabs, state.groupMemberList]);
+
+  // Visible tabs = tabs with >0 members
+  // During search, keep all configured tabs visible so the active tab doesn't disappear
+  const visibleRoleTabs = useMemo(() => {
+    if (!roleTabs || !roleTabBuckets) return [];
+    if (state.searchText) return roleTabs;
+    return roleTabs.filter((tab) => (roleTabBuckets[tab.key]?.length ?? 0) > 0);
+  }, [roleTabs, roleTabBuckets, state.searchText]);
+
+  // Auto-select first visible tab
+  useEffect(() => {
+    if (visibleRoleTabs.length > 0) {
+      if (!activeRoleTabKey || !visibleRoleTabs.some((t) => t.key === activeRoleTabKey)) {
+        setActiveRoleTabKey(visibleRoleTabs[0].key);
+      }
+    }
+  }, [visibleRoleTabs]);
+
+  // Filtered list for current tab
+  const roleFilteredList = useMemo(() => {
+    if (!roleTabBuckets || !activeRoleTabKey) return null;
+    return roleTabBuckets[activeRoleTabKey] ?? [];
+  }, [roleTabBuckets, activeRoleTabKey]);
+
+  // WCAG 2.2 keyboard navigation for role tabs
+  const handleRoleTabKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLButtonElement>) => {
+      if (visibleRoleTabs.length <= 1) return;
+      const idx = visibleRoleTabs.findIndex((t) => t.key === activeRoleTabKey);
+      let nextIdx = idx;
+      switch (e.key) {
+        case "ArrowRight":
+        case "ArrowDown":
+          e.preventDefault();
+          nextIdx = (idx + 1) % visibleRoleTabs.length;
+          break;
+        case "ArrowLeft":
+        case "ArrowUp":
+          e.preventDefault();
+          nextIdx = (idx - 1 + visibleRoleTabs.length) % visibleRoleTabs.length;
+          break;
+        case "Home":
+          e.preventDefault();
+          nextIdx = 0;
+          break;
+        case "End":
+          e.preventDefault();
+          nextIdx = visibleRoleTabs.length - 1;
+          break;
+        default:
+          return;
+      }
+      setActiveRoleTabKey(visibleRoleTabs[nextIdx].key);
+      const tabList = roleTabListRef.current;
+      if (tabList) {
+        const buttons = tabList.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+        buttons[nextIdx]?.focus();
+      }
+    },
+    [visibleRoleTabs, activeRoleTabKey],
+  );
   const searchPlaceholderTextRef = useRef<string>(getLocalizedString("member_search_placeholder"));
   /**
    * Updates the `searchText` state
@@ -964,6 +1067,13 @@ export function CometChatGroupMembers(props: GroupMembersProps) {
             role="dialog"
             aria-modal="true"
             aria-label={getLocalizedString("change_scope") || "Change member scope"}
+            tabIndex={-1}
+            ref={(el) => el?.focus()}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                handleChangeScopeClose();
+              }
+            }}
           >
             <CometChatChangeScope
               options={groupMemberAllowedScopes}
@@ -1094,9 +1204,11 @@ export function CometChatGroupMembers(props: GroupMembersProps) {
     hideUserStatus
   });
 
+  // Determine which list to pass to CometChatList
+  const displayList = roleFilteredList ?? state.groupMemberList;
   const displayedMembers = firstItemView
-    ? [FIRST_ITEM, ...state.groupMemberList]
-    : state.groupMemberList;
+    ? [FIRST_ITEM, ...displayList]
+    : displayList;
 
   return (
     <div className="cometchat" style={{ width: "100%", height: "100%" }}>
@@ -1105,40 +1217,78 @@ export function CometChatGroupMembers(props: GroupMembersProps) {
         role="region"
         aria-label={getLocalizedString("group_members") || "Group members"}
       >
-        <CometChatList
-          showScrollbar={showScrollbar}
-          searchPlaceholderText={searchPlaceholderTextRef.current}
-          searchText={state.searchText}
-          onSearch={onSearchTextChange}
-          hideSearch={hideSearch}
-          list={displayedMembers}
-          listItemKey='getUid'
-          itemView={(member) => member === FIRST_ITEM ? firstItemView! : getListItem()(member)}
-          showSectionHeader={false}
-          onScrolledToBottom={() =>
-            fetchNextAndAppendGroupMembers(
-              (fetchNextIdRef.current =
-                "onScrolledToBottom_" + String(Date.now())),
-                true
-            )
-          }
-          state={state.fetchState === States.loaded && displayedMembers.length === 0 ? States.empty : state.fetchState}
-          loadingView={getLoadingView()}
-          emptyView={getEmptyView()}
-          errorView={getErrorView()}
-          hideError={hideError}
-          headerView={headerView}
-
-        />
-        {isFetchingMore && hasMoreMembers && (
-          <div 
-            className="cometchat-group-members__loading-more"
-            role="status"
-            aria-label={getLocalizedString("loading") || "Loading more members"}
+        {visibleRoleTabs.length > 1 && (
+          <div
+            className="cometchat-group-members__role-tabs"
+            role="tablist"
+            aria-label="Member roles"
+            ref={roleTabListRef}
           >
-            <div className="cometchat-group-members__loading-more-icon" aria-hidden="true" />
+            {visibleRoleTabs.map((tab) => {
+              const isActive = activeRoleTabKey === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  id={`cometchat-role-tab-${tab.key}`}
+                  role="tab"
+                  type="button"
+                  aria-selected={isActive}
+                  aria-controls={`cometchat-role-tabpanel-${tab.key}`}
+                  tabIndex={isActive ? 0 : -1}
+                  className={`cometchat-group-members__role-tab${isActive ? ' cometchat-group-members__role-tab--active' : ''}`}
+                  onClick={() => setActiveRoleTabKey(tab.key)}
+                  onKeyDown={handleRoleTabKeyDown}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
         )}
+        <div
+          {...(visibleRoleTabs.length > 1 && activeRoleTabKey ? {
+            role: "tabpanel",
+            id: `cometchat-role-tabpanel-${activeRoleTabKey}`,
+            "aria-labelledby": `cometchat-role-tab-${activeRoleTabKey}`,
+            tabIndex: 0,
+          } : {})}
+          style={{ display: "contents" }}
+        >
+          <CometChatList
+            showScrollbar={showScrollbar}
+            searchPlaceholderText={searchPlaceholderTextRef.current}
+            searchText={state.searchText}
+            onSearch={onSearchTextChange}
+            hideSearch={hideSearch}
+            list={displayedMembers}
+            listItemKey='getUid'
+            itemView={(member) => member === FIRST_ITEM ? firstItemView! : getListItem()(member)}
+            showSectionHeader={false}
+            onScrolledToBottom={() =>
+              fetchNextAndAppendGroupMembers(
+                (fetchNextIdRef.current =
+                  "onScrolledToBottom_" + String(Date.now())),
+                  true
+              )
+            }
+            state={state.fetchState === States.loaded && displayedMembers.length === 0 ? States.empty : state.fetchState}
+            loadingView={getLoadingView()}
+            emptyView={getEmptyView()}
+            errorView={getErrorView()}
+            hideError={hideError}
+            headerView={headerView}
+
+          />
+          {isFetchingMore && hasMoreMembers && (
+            <div 
+              className="cometchat-group-members__loading-more"
+              role="status"
+              aria-label={getLocalizedString("loading") || "Loading more members"}
+            >
+              <div className="cometchat-group-members__loading-more-icon" aria-hidden="true" />
+            </div>
+          )}
+        </div>
         {getGroupMemberScopeChangeModal()}
       </div>
 

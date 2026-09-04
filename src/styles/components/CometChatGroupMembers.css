@@ -9,6 +9,58 @@
   background: var(--cometchat-background-color-01, #fff);
 }
 
+/* ── Role tabs ──────────────────────────────────────────────────────── */
+.cometchat-group-members__role-tabs {
+  display: flex;
+  width: 100%;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--cometchat-border-color-light, #eef0f2);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.cometchat-group-members__role-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 10px 0;
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-align: center;
+  color: var(--cometchat-text-color-secondary, #727272);
+  cursor: pointer;
+  position: relative;
+  font-family: inherit;
+}
+
+.cometchat-group-members__role-tab:hover {
+  color: var(--cometchat-text-color-primary, #141414);
+}
+
+.cometchat-group-members__role-tab:focus-visible {
+  outline: 2px solid var(--cometchat-primary-color, #6852d6);
+  outline-offset: -2px;
+  border-radius: 4px;
+}
+
+.cometchat-group-members__role-tab--active {
+  color: var(--cometchat-text-color-primary, #141414);
+  font-weight: 600;
+}
+
+.cometchat-group-members__role-tab--active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--cometchat-text-color-primary, #141414);
+  border-radius: 2px 2px 0 0;
+}
+
 .cometchat-group-members__backdrop {
   background: rgba(0, 0, 0, 0.5);
   position: absolute;
@@ -20,6 +72,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.cometchat-group-members__backdrop:focus {
+  outline: none;
 }
 
 
@@ -101,6 +157,7 @@
 .cometchat-group-members__empty-state-view {
   display: flex;
   flex-direction: column;
+  padding: 20px 0;
 }
 
 .cometchat-group-members__empty-state-view,
