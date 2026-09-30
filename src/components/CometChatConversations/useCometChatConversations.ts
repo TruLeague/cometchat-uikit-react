@@ -49,6 +49,8 @@ export function useCometChatConversations(args: Args) {
   } = args;
 
   const isFirstRenderRef = useRef<boolean>(true);
+  const activeConversationRef = useRef<Conversation | null>(activeConversation);
+  activeConversationRef.current = activeConversation;
 
   useEffect(
     /**
@@ -280,7 +282,12 @@ export function useCometChatConversations(args: Args) {
             return;
           }
           CometChat.CometChatHelper.getConversationFromMessage(item.message).then(conversation => {
-            setActiveConversationState(conversation);
+            if (
+              activeConversationRef.current?.getConversationId() ===
+              conversation.getConversationId()
+            ) {
+              setActiveConversationState(conversation);
+            }
             dispatch({ type: "updateConversationLastMessageResetUnreadCountAndPlaceAtTheTop", message: item.message, conversation: conversation });
           });
         }
