@@ -780,6 +780,8 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
 
   const errorHandler = useCometChatErrorHandler(onError);
   const [activeConversationState, setActiveConversationState] = useState(activeConversation);
+  const activeConversationRef = useRef(activeConversation);
+  activeConversationRef.current = activeConversation;
   const searchRequestRef = useRef<CometChat.ConversationsRequest | null>(null);
   const lastSearchKeyword = useRef<string>(searchKeyword);
   const lastActiveFilters = useRef<CometChatSearchFilter[]>(activeFilters);
@@ -1130,7 +1132,12 @@ export function useCometChatSearchConversationsList(props: UseCometChatSearchCon
               return;
             }
             CometChat.CometChatHelper.getConversationFromMessage(item.message).then(conversation => {
-              setActiveConversationState(conversation);
+              if (
+                activeConversationRef.current?.getConversationId() ===
+                conversation.getConversationId()
+              ) {
+                setActiveConversationState(conversation);
+              }
               dispatch({ type: "updateConversationLastMessageResetUnreadCountAndPlaceAtTheTop", message: item.message, conversation: conversation });
             });
           }
