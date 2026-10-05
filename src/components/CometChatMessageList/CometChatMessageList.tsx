@@ -20,6 +20,7 @@ import { CometChatMessageInformation } from "../CometChatMessageInformation/Come
 import { useCometChatMessageList } from "./useCometChatMessageList";
 import { MessageListManager } from "./CometChatMessageListController";
 import { CometChatUIKitUtility } from "../../CometChatUIKit/CometChatUIKitUtility";
+import { CometChatUIKitLoginListener } from "../../CometChatUIKit/CometChatUIKitLoginListener";
 import { CometChatActionsIcon, CometChatActionsView, CometChatMessageTemplate } from "../../modals";
 import { MessageBubbleAlignment, MessageListAlignment, MessageStatus, PanelAlignment, States } from "../../Enums/Enums";
 import { CometChatUIKitConstants } from "../../constants/CometChatUIKitConstants";
@@ -587,7 +588,12 @@ const CometChatMessageList = (props: MessageListProps) => {
   * All the useRef useCometChatMessageList are declaired here. These do not trigger a rerender. They are used to get the updated values wherever required in the code.
    */
   const stickyDateHeaderRef = useRef<number>(0);
-  const loggedInUserRef = useRef<CometChat.User | null>(null);
+  // UIKit authenticates before mounting the list; reuse that identity immediately.
+  const [loggedInUser, setLoggedInUser] = useState<CometChat.User | null>(() => {
+    const currentUser = CometChatUIKitLoginListener.getLoggedInUser();
+    return currentUser?.getUid() ? currentUser : null;
+  });
+  const loggedInUserRef = useRef<CometChat.User | null>(loggedInUser);
   const isFirstReloadRef = useRef<boolean>(false);
   const elementRefs = useRef<any>({});
   const messageListManagerRef = useRef<any>(null);
@@ -1702,7 +1708,7 @@ const CometChatMessageList = (props: MessageListProps) => {
       msgObject: CometChat.BaseMessage
     ): (CometChatActionsIcon | CometChatActionsView)[] => {
       let options: (CometChatActionsIcon | CometChatActionsView)[] = [];
-      if (!msgObject.getId()) {
+      if (!msgObject.getId() || !loggedInUserRef.current?.getUid()) {
         return options;
       }
       try {
@@ -1749,6 +1755,7 @@ const CometChatMessageList = (props: MessageListProps) => {
     },
     [
       messagesTemplate,
+      loggedInUser,
       setDefaultOptionsCallback,
       errorHandler,
       hideReplyInThreadOption,
@@ -1796,7 +1803,7 @@ const CometChatMessageList = (props: MessageListProps) => {
         return bubbleAlignment;
       }
     },
-    [messageAlignment, errorHandler]
+    [messageAlignment, errorHandler, loggedInUser]
   );
 
   /**
@@ -4571,6 +4578,8 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
    */
   useCometChatMessageList(
     loggedInUserRef,
+    loggedInUser,
+    setLoggedInUser,
     messageListManagerRef,
     fetchPreviousMessages,
     handleGroupAndCallActions,
@@ -4774,18 +4783,18 @@ const getStatusInfoView: (item: CometChat.BaseMessage) => any = useCallback(
           <div className="cometchat-message-list__body"
           >
             <CometChatList
-              showShimmerOnTop={(isAgentChat && !parentMessageId) ? false : isMessageRepliedToAvailable ? true : !hasCompletedInitialLoad}
+              showShimmerOnTop={!loggedInUser || ((isAgentChat && !parentMessageId) ? false : isMessageRepliedToAvailable ? true : !hasCompletedInitialLoad)}
               showScrollbar={showScrollbar}
               scrolledUpCallback={updateIsOnBottom}
               headerView={undefined}
               hideSearch={true}
               showSectionHeader={false}
-              list={messageList}
+              list={loggedInUser ? messageList : []}
               itemView={getListItem}
               onScrolledToBottom={isAgentChat ? undefined : onBottomCallback}
               onScrolledToTop={isAgentChat && !parentMessageId ? undefined : onTopCallback}
               listItemKey='getMuid'
-              state={shouldShowEmptyState ? States.empty :  getCurrentMessageListState()}
+              state={!loggedInUser ? States.loading : shouldShowEmptyState ? States.empty : getCurrentMessageListState()}
               loadingView={getLoaderHtml}
               hideError={hideError}
               errorView={getErrorHtml}
