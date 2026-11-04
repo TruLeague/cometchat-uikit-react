@@ -1267,7 +1267,14 @@ const CometChatMessageList = (props: MessageListProps) => {
   const updateMessageByMessageId: (message: CometChat.BaseMessage) => void = useCallback(
     (message: CometChat.BaseMessage) => {
       try {
-        setScrollListToBottom(false);
+        const messageElement = elementRefs.current[message.getId()]?.current;
+        const replyContainer = messageElement?.closest(".cometchat-threaded-message")
+          ?? messageElement?.closest(".cometchat-message-list");
+        setScrollListToBottom(
+          isOnBottomRef.current &&
+          message.getData()?.moderation?.status === CometChatUIKitConstants.moderationStatus.disapproved &&
+          Boolean(replyContainer?.querySelector(".cc-smart-replies--collapsed"))
+        );
         setMessageList((prevMessageList: CometChat.BaseMessage[]) => {
           const messages = prevMessageList.map((m: CometChat.BaseMessage) => {
             if (m?.getQuotedMessageId() === message?.getId()) {
