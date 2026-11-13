@@ -141,6 +141,24 @@ export function useCometChatList(args: Args) {
             }
         });
 
+    // Keep a pinned message list at the bottom when its footer resizes the viewport.
+    useEffect(() => {
+        const rootElement = intersectionObserverRootRef.current;
+        if (!rootElement?.closest(".cometchat-message-list") || typeof ResizeObserver === "undefined") return;
+
+        let previousHeight = rootElement.clientHeight;
+        const observer = new ResizeObserver(() => {
+            const nextHeight = rootElement.clientHeight;
+            if (nextHeight === previousHeight) return;
+
+            const wasAtBottom = rootElement.scrollHeight - rootElement.scrollTop - previousHeight <= 1;
+            previousHeight = nextHeight;
+            if (wasAtBottom) rootElement.scrollTop = rootElement.scrollHeight;
+        });
+        observer.observe(rootElement);
+        return () => observer.disconnect();
+    }, [intersectionObserverRootRef]);
+
     useEffect(
         /**
          * Set the scrollbar to be at the bottom-most position of the scrollable list if some conditions are met
