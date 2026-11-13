@@ -1271,12 +1271,13 @@ const CometChatMessageList = (props: MessageListProps) => {
           const messageElement = elementRefs.current[message.getId()]?.current;
           const replyContainer = messageElement?.closest(".cometchat-threaded-message")
             ?? messageElement?.closest(".cometchat-message-list");
-          setScrollListToBottom(
-            isOnBottomRef.current &&
-            message.getData()?.moderation?.status === CometChatUIKitConstants.moderationStatus.disapproved &&
-            Boolean(replyContainer) &&
-            !replyContainer.querySelector(".cc-smart-replies--expanded")
-          );
+          // A moderation response can arrive before the outgoing bubble renders; keep its pending scroll.
+          if (replyContainer) {
+            setScrollListToBottom(
+              isOnBottomRef.current &&
+              message.getData()?.moderation?.status === CometChatUIKitConstants.moderationStatus.disapproved
+            );
+          }
         }
         setMessageList((prevMessageList: CometChat.BaseMessage[]) => {
           const messages = prevMessageList.map((m: CometChat.BaseMessage) => {
