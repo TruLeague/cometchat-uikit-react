@@ -1264,18 +1264,20 @@ const CometChatMessageList = (props: MessageListProps) => {
  * @param {CometChat.BaseMessage} message - The message object that needs to be replaced in the list.
  * @returns {void}
  */
-  const updateMessageByMessageId: (message: CometChat.BaseMessage) => void = useCallback(
-    (message: CometChat.BaseMessage) => {
+  const updateMessageByMessageId: (message: CometChat.BaseMessage, preserveScrollState?: boolean) => void = useCallback(
+    (message: CometChat.BaseMessage, preserveScrollState: boolean = false) => {
       try {
-        const messageElement = elementRefs.current[message.getId()]?.current;
-        const replyContainer = messageElement?.closest(".cometchat-threaded-message")
-          ?? messageElement?.closest(".cometchat-message-list");
-        setScrollListToBottom(
-          isOnBottomRef.current &&
-          message.getData()?.moderation?.status === CometChatUIKitConstants.moderationStatus.disapproved &&
-          Boolean(replyContainer) &&
-          !replyContainer.querySelector(".cc-smart-replies--expanded")
-        );
+        if (!preserveScrollState) {
+          const messageElement = elementRefs.current[message.getId()]?.current;
+          const replyContainer = messageElement?.closest(".cometchat-threaded-message")
+            ?? messageElement?.closest(".cometchat-message-list");
+          setScrollListToBottom(
+            isOnBottomRef.current &&
+            message.getData()?.moderation?.status === CometChatUIKitConstants.moderationStatus.disapproved &&
+            Boolean(replyContainer) &&
+            !replyContainer.querySelector(".cc-smart-replies--expanded")
+          );
+        }
         setMessageList((prevMessageList: CometChat.BaseMessage[]) => {
           const messages = prevMessageList.map((m: CometChat.BaseMessage) => {
             if (m?.getQuotedMessageId() === message?.getId()) {
@@ -3774,7 +3776,11 @@ const CometChatMessageList = (props: MessageListProps) => {
         onMessageModerated =
         CometChatMessageEvents.onMessageModerated.subscribe(
           (moderatedMessage: CometChat.BaseMessage) => {
-            updateMessageByMessageId(moderatedMessage);
+            // An approval must not cancel the scroll requested by an outgoing send.
+            updateMessageByMessageId(
+              moderatedMessage,
+              moderatedMessage.getData()?.moderation?.status === CometChatUIKitConstants.moderationStatus.approved
+            );
           }
         );
       }
