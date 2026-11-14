@@ -1275,8 +1275,7 @@ const CometChatMessageList = (props: MessageListProps) => {
           if (replyContainer) {
             setScrollListToBottom(
               isOnBottomRef.current &&
-              message.getData()?.moderation?.status === CometChatUIKitConstants.moderationStatus.disapproved &&
-            !replyContainer.querySelector(".cc-smart-replies--expanded")
+              message.getData()?.moderation?.status === CometChatUIKitConstants.moderationStatus.disapproved
             );
           }
         }
