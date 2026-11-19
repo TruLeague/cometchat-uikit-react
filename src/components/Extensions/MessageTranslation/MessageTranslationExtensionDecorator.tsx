@@ -1,5 +1,6 @@
 import { CometChat } from "@cometchat/chat-sdk-javascript";
 import { DataSource } from "../../../utils/DataSource";
+import { getMessageTextOverride } from "../../../utils/messageTextTransformer";
 import { DataSourceDecorator } from "../../../utils/DataSourceDecorator";
 import TranslateIcon from "../../../assets/translate.svg";
 import { ChatConfigurator } from "../../../utils/ChatConfigurator";
@@ -132,6 +133,9 @@ export class MessageTranslationExtensionDecorator extends DataSourceDecorator {
     alignment: MessageBubbleAlignment,
     additionalConfigurations?: any
   ) {
+    if (getMessageTextOverride(message) !== null) {
+      return super.getTextMessageContentView(message, alignment, additionalConfigurations);
+    }
     const metadata: any = message.getMetadata();
     if (
       metadata &&

@@ -4,6 +4,7 @@ import { DataSource } from "./DataSource";
 import React, { JSX } from "react";
 import { CometChatUIKitLoginListener } from "../CometChatUIKit/CometChatUIKitLoginListener";
 import { resolveDisplayName } from "./nameTransformer";
+import { getMessageTextOverride } from "./messageTextTransformer";
 import { ConversationUtils, additionalParams } from "./ConversationUtils";
 import { CometChatMentionsFormatter } from "../formatters/CometChatFormatters/CometChatMentionsFormatter/CometChatMentionsFormatter";
 import { CometChatUrlsFormatter } from "../formatters/CometChatFormatters/CometChatUrlsFormatter/CometChatUrlsFormatter";
@@ -1049,7 +1050,7 @@ getMessageSentAtDateFormat(messageSentAtDateTimeFormat?:CalendarObject) {
     additionalConfigurations?: additionalParams
   ) {
     return ChatConfigurator.getDataSource().getTextMessageBubble(
-      message.getText(),
+      getMessageTextOverride(message) ?? message.getText(),
       message,
       _alignment,
       additionalConfigurations
@@ -1720,7 +1721,7 @@ getMessagePreviewSubtitle(
     // Handle different message types
     switch (messageType) {
       case CometChatUIKitConstants.MessageTypes.text:
-        const messageText = (message as CometChat.TextMessage).getText();
+        const messageText = getMessageTextOverride(message) ?? (message as CometChat.TextMessage).getText();
         return createTextWrapper(messageText);
 
       case CometChatUIKitConstants.MessageTypes.image:

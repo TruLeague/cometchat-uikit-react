@@ -22,6 +22,8 @@ import { ChatSdkEventInitializer } from "../utils/ChatSdkEventInitializer";
 import { CometChatMessageEvents } from "../events/CometChatMessageEvents";
 import { MessageStatus } from "../Enums/Enums";
 import { setNameTransformerFn, resolveDisplayName } from "../utils/nameTransformer";
+import { setMessageTextTransformerFn } from "../utils/messageTextTransformer";
+import type { MessageTextTransformer } from "../utils/messageTextTransformer";
 
 interface CometChatUiKit {
     name: string;
@@ -89,6 +91,15 @@ class CometChatUIKit {
     static setNameTransformer(fn: (name: string, user?: CometChat.User | CometChat.GroupMember | null) => string) {
         CometChatUIKit.nameTransformer = fn;
         setNameTransformerFn(fn);
+    }
+
+    /**
+     * Registers a host-provided text override for bubbles, previews, and copy actions.
+     * Returning null uses the default view. An override skips extensions based on
+     * the original text; editable and outgoing message text remain unchanged.
+     */
+    static setMessageTextTransformer(transformer: MessageTextTransformer | null) {
+        setMessageTextTransformerFn(transformer);
     }
 
     /**
