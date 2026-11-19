@@ -44,6 +44,7 @@ import { convertHeicFileToJpeg, isHeicFile } from '../../utils/heicSupport';
 import { CometChatMessageEvents } from '../../events/CometChatMessageEvents';
 import { CometChatUIEvents } from '../../events/CometChatUIEvents';
 import { resolveDisplayName } from '../../utils/nameTransformer';
+import { getMessageTextOverride } from '../../utils/messageTextTransformer';
 import { CometChatSoundManager } from "../../resources/CometChatSoundManager/CometChatSoundManager";
 import { useCometChatFrameContext } from "../../context/CometChatFrameContext";
 import { CometChatMessagePreview } from "../BaseComponents/CometChatMessagePreview/CometChatMessagePreview";
@@ -2666,7 +2667,7 @@ try {
     const checkForMentions = (message: CometChat.TextMessage) => {
       const regex = /<@uid:(.*?)>/g;
       const channelRegex = /<@all:(.*?)>/g;
-      let messageText = message.getText();
+      let messageText = getMessageTextOverride(message) ?? message.getText();
       let messageTextTmp = messageText;
       let match = regex.exec(messageText);
       let channelMatch = channelRegex.exec(messageText);
