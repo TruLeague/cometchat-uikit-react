@@ -2633,9 +2633,15 @@ const CometChatMessageList = (props: MessageListProps) => {
           if (!hasCompletedInitialLoad) {
             setMessageListState(States.loading);
           }
-          messageListManagerRef?.current.next.fetchNextMessages().then(
+          const nextManager = messageListManagerRef.current.next;
+          const pageSize = nextManager.messagesRequest?.getLimit() ?? 30;
+          nextManager.fetchNextMessages().then(
             (messagesList: CometChat.BaseMessage[]) => {
               if (messagesList) {
+                // SDK requests cache one-page results; fetch from the loaded cursor next time.
+                if (messageListManagerRef.current.next === nextManager) {
+                  messageListManagerRef.current.next = null;
+                }
                 if (messagesList.length === 0) {
                   hasReachedBottomRef.current = true;
                   if (totalMessagesCountRef.current === 0) {
@@ -2645,7 +2651,7 @@ const CometChatMessageList = (props: MessageListProps) => {
                   }
                   resolve(true);
                 } else {
-                  hasReachedBottomRef.current = false;
+                  hasReachedBottomRef.current = messagesList.length < pageSize;
                   appendMessages(messagesList).then(
                     (success) => {
                       if (!goToMessageId && !messageRepliedTo && !hasCompletedInitialLoad) {
