@@ -3694,8 +3694,6 @@ const CometChatMessageList = (props: MessageListProps) => {
           (obj: IMessages) => {
             if (obj?.status === MessageStatus.success) {
               if (isPartOfCurrentChatForUIEvent(obj.message)) {
-                toastTextRef.current = getLocalizedString("message_list_message_edited");
-                setShowToast(true);
                 updateMessage(obj.message, false);
               }
             }
