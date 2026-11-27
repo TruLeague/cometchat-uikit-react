@@ -53,6 +53,7 @@ import { PanelTypeContext } from "../../context/PanelTypeContext";
 import { startStreamingMessage, streamingState$ } from "../../services/stream-message.service";
 import { sendMessageToMobileApp } from "../../utils/MobileBridge";
 import { resolveDisplayName } from "../../utils/nameTransformer";
+import { getMessageTextOverride } from "../../utils/messageTextTransformer";
 import { useMessageReceipts } from "./useMessageReceipts";
 
 
@@ -1198,8 +1199,8 @@ const CometChatMessageList = (props: MessageListProps) => {
   const getMentionsTextWithoutStyle: (message: CometChat.TextMessage) => string = (message: CometChat.TextMessage) => {
     try {
       const regex = /<@uid:(.*?)>/g;
-      let messageText = message.getText();
-      let messageTextTmp = message.getText();
+      let messageText = getMessageTextOverride(message) ?? message.getText();
+      let messageTextTmp = messageText;
       let match = regex.exec(messageText);
       let mentionedUsers = message.getMentionedUsers();
       while (match !== null) {
@@ -1467,7 +1468,7 @@ const CometChatMessageList = (props: MessageListProps) => {
       try {
         let message: CometChat.TextMessage = getMessageById(id) as CometChat.TextMessage;
         if (message) {
-          let text = message.getText();
+          let text = getMessageTextOverride(message) ?? message.getText();
           if (
             message.getMentionedUsers() &&
             message.getMentionedUsers().length

@@ -123,6 +123,17 @@ const CometChatThreadHeader = (props: CometChatThreadHeaderProps) => {
 
     const onErrorCallback = useCometChatErrorHandler(onError);
 
+    const updateParentMessage = useCallback((message: CometChat.BaseMessage) => {
+        setUpdatedMessage((previous) => {
+            if (message.getId() !== previous.getId()) return previous;
+            const editedAt = message.getEditedAt();
+            const previousEditedAt = previous.getEditedAt();
+            if (editedAt && previousEditedAt && editedAt < previousEditedAt) return previous;
+            // Extension metadata can change while editedAt stays the same.
+            return message;
+        });
+    }, []);
+
     useEffect(() => {
         try {
             setReplyCount(updatedMessage?.getReplyCount() ?? 0);
@@ -185,16 +196,9 @@ const CometChatThreadHeader = (props: CometChatThreadHeaderProps) => {
                     }
                 );
             const onMessageEdited =
-                CometChatMessageEvents.onMessageEdited.subscribe(
-                    (message: CometChat.BaseMessage) => {
-                        setUpdatedMessage((prevMessage) => {
-                            if (message.getId() == prevMessage.getId() && (!prevMessage.getEditedAt() || prevMessage.getEditedAt() != message.getEditedAt())) {
-                                return message;
-                            }
-                            return prevMessage;
-                        })
-                    }
-                );
+                CometChatMessageEvents.onMessageEdited.subscribe(updateParentMessage);
+            const onMessageModerated =
+                CometChatMessageEvents.onMessageModerated.subscribe(updateParentMessage);
             const onCustomMessageReceived =
                 CometChatMessageEvents.onCustomMessageReceived.subscribe(
                     (message: CometChat.CustomMessage) => {
@@ -254,13 +258,14 @@ const CometChatThreadHeader = (props: CometChatThreadHeaderProps) => {
                 onCardMessageReceived?.unsubscribe();
                 onCustomInteractiveMessageReceived?.unsubscribe();
                 onMessageEdited?.unsubscribe();
+                onMessageModerated?.unsubscribe();
             };
         }
         catch (error) {
             onErrorCallback(error, 'addListener');
             return () => { }
         }
-    }, [parentMessage]);
+    }, [parentMessage, updateParentMessage]);
 
     const subscribeToEvents = useCallback(() => {
         try {
@@ -276,15 +281,7 @@ const CometChatThreadHeader = (props: CometChatThreadHeaderProps) => {
             );
             const ccMessageEdited = CometChatMessageEvents.ccMessageEdited.subscribe(
                 ({ status, message }: IMessages) => {
-                    if (
-                        status === MessageStatus.success                    ) {
-                        setUpdatedMessage((prevMessage) => {
-                            if (message.getId() == prevMessage.getId() && (!prevMessage.getEditedAt() || prevMessage.getEditedAt() != message.getEditedAt())) {
-                                return message;
-                            }
-                            return prevMessage;
-                        })
-                    }
+                    if (status === MessageStatus.success) updateParentMessage(message);
                 }
             );
             const ccMessageDeleted = CometChatMessageEvents.ccMessageDeleted.subscribe(
@@ -307,7 +304,7 @@ const CometChatThreadHeader = (props: CometChatThreadHeaderProps) => {
             onErrorCallback(error, 'subscribeToEvents');
             return () => { }
         }
-    }, [parentMessage]);
+    }, [parentMessage, updateParentMessage]);
 
     useEffect(() => {
         try {

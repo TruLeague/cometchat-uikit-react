@@ -12,6 +12,7 @@ import { CometChatUrlsFormatter } from "../../../formatters/CometChatFormatters/
 import { MessageBubbleAlignment } from "../../../Enums/Enums";
 import { CometChatUIKitConstants } from "../../../constants/CometChatUIKitConstants";
 import { CometChatTextBubble } from "../../BaseComponents/CometChatTextBubble/CometChatTextBubble";
+import { getMessageTextOverride } from "../../../utils/messageTextTransformer";
 
 /**
  * The `LinkPreviewExtensionDecorator` class is responsible for adding link preview functionality
@@ -59,6 +60,9 @@ export class LinkPreviewExtensionDecorator extends DataSourceDecorator {
     alignment: MessageBubbleAlignment,
     additionalConfigurations?: any
   ) {
+    if (getMessageTextOverride(message) !== null) {
+      return super.getTextMessageContentView(message, alignment, additionalConfigurations);
+    }
     const linkPreviewObject: any = this.getLinkPreview(message);
     if (
       linkPreviewObject &&
